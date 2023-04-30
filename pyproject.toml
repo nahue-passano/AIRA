@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "3daira"
+version = "0.1.0"
+description = "3D Ambisonics Impulse Response Analyzer"
+authors = ["Nahuel Passano <passano43632@estudiantes.untref.edu.ar>,Ivan Pupkin <ipupkin@untref.edu.ar>"]
+
+[tool.poetry.dependencies]
+python = ">=3.8,<3.10"
+numpy = "^1.24.3"
+librosa = "^0.10.0"
+scipy = "^1.10.1"
+soundfile = "^0.12.1"
+
+[tool.poetry.dev-dependencies]
+black = "^23.3.0"
+pylint = "^2.17.3"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

@@ -1,18 +1,18 @@
 import numpy as np
 import scipy.signal as sc
 
+
 def inverse_filter():
     pass
 
-def non_coincident_omni_correction(center2mic: float,
-                                   c: float = 340):
+
+def non_coincident_omni_correction(center2mic: float, c: float = 340):
     pass
-    
-    
-def non_coincident_axes_correction(center2mic: float,
-                                   c: float = 340):
+
+
+def non_coincident_axes_correction(center2mic: float, c: float = 340):
     pass
-    
+
 
 def convolve(signal_1: np.ndarray, signal_2: np.ndarray) -> np.ndarray:
     """_summary_
