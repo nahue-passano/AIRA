@@ -3,6 +3,7 @@ from abc import ABC, abstractstaticmethod
 import numpy as np
 from scipy.signal import find_peaks
 
+
 class ReflectionDetectionStrategy(ABC):
     @abstractstaticmethod
     def get_indeces_of_reflections(intensity_magnitude: np.ndarray) -> np.ndarray:
@@ -21,7 +22,7 @@ class ThresholdReflectionDetectionStrategy(ReflectionDetectionStrategy):
         raise NotImplementedError("Implemented method is Scipy's find_peaks")
 
 
-class NeighborReflectionDetectionStrategy(ReflectionDetectionStrategy):
+class NeighborReflectionDetectionStrategy(ReflectionDetectionStrategy):    
     @staticmethod
     def get_indeces_of_reflections(intensity_magnitude: np.ndarray) -> np.ndarray:
         """Find local maxima in the intensity magnitude signal.
