@@ -15,6 +15,7 @@ Ambisonics Impulse Response Analyzer
 - [ ] Investigar en tps viejos como se llevaron a cabo estos procesamientos
   - Fran Roge (https://github.com/FranciscoRogeVallone/Brojo-Software)
   - Mazalay (https://github.com/imazzala/3D-RIRs/blob/main/main_processing.py)
+    - No aplican correción en frecuencia por la no coincidencia espacial de las cápsulas
 
 - El front va a ver
   - Cargar un SS
