@@ -2,12 +2,15 @@ import numpy as np
 import scipy.signal as sc
 
 
+SOUND_VELOCITY = 340
+
+
 def inverse_filter():
     pass
 
 
 class NonCoincidentMicsCorrection:
-    def __init__(self, mic2center: float, fs: int, c: float = 340) -> None:
+    def __init__(self, mic2center: float, fs: int, c: float = SOUND_VELOCITY) -> None:
         self.mic2center = mic2center / 100
         self.fs = fs
         self.c = c
