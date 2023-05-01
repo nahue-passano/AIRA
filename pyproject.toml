@@ -2,7 +2,10 @@
 name = "aira"
 version = "0.1.0"
 description = "3D Ambisonics Impulse Response Analyzer"
-authors = ["Nahuel Passano <passano43632@estudiantes.untref.edu.ar>,Ivan Pupkin <ipupkin@untref.edu.ar>"]
+authors = [
+    "Ivan Pupkin <ipupkin@untref.edu.ar>",
+    "Nahuel Passano <passano43632@estudiantes.untref.edu.ar>"
+]
 
 [tool.poetry.dependencies]
 python = ">=3.8,<3.9"
