@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "3daira"
+version = "0.1.0"
+description = ""
+authors = [
+    "Ivan Pupkin <ipupkin@untref.edu.ar>",
+    "Nahuel Passano <passano43632@estudiantes.untref.edu.ar>"
+]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">=3.8, <3.10"
+black = "^23.3.0"
+pre-commit = "^3.2.2"
+numpy = "^1.24.3"
+scipy = "^1.10.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

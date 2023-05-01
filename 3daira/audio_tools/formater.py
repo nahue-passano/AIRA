@@ -1,9 +1,9 @@
 import numpy as np
 
-def A2B_format(FLU: np.ndarray,
-               FRD: np.ndarray,
-               BRU: np.ndarray,
-               BLD: np.ndarray) -> tuple:
+
+def A2B_format(
+    FLU: np.ndarray, FRD: np.ndarray, BRU: np.ndarray, BLD: np.ndarray
+) -> tuple:
     """Converts Ambisonics A-format to B-format
 
     Parameters
@@ -22,7 +22,7 @@ def A2B_format(FLU: np.ndarray,
     tuple
         B-format outputs (W, X, Y, Z)
     """
-    
+
     W = FLU + FRD + BLD + BRU
     X = FLU + FRD - BLD - BRU
     Y = FLU - FRD + BLD - BRU
