@@ -75,7 +75,7 @@ def hamming_window(
     return Ix_vent, Iy_vent, Iz_vent
 
 
-def integrate_bformat_intensities(
+def integrate_intensity_directions(
     intensity_directions: np.ndarray,
     duration_secs: float,
     sample_rate: int,
@@ -100,20 +100,20 @@ def integrate_bformat_intensities(
     duration_samples = duration_samples.astype(np.int64)
 
     # Peak scanning: keep only from the leftmost highest peak to the end of the signal
-    earliest_peak_index = np.argmax(intensity_directions, axis=1).min()
+    earliest_peak_index = np.argmax(np.abs(intensity_directions), axis=1).min()
     intensity_directions = intensity_directions[:, earliest_peak_index:]
 
-    # Windowing
+    # Padding and windowing
     intensity_directions = np.concatenate(
         [intensity_directions, np.zeros((3, intensity_directions.shape[1] % duration_samples))],
         axis=1,
-    )  # Padding
+    )
     output_shape = (3, intensity_directions.shape[1] // duration_samples)
     intensity_windowed = np.zeros(output_shape)
     window = np.hamming(duration_samples)
     for i in range(0, output_shape[1]):
         intensity_segment = intensity_directions[:, i : i + duration_samples]
-        intensity_windowed[:, i] = np.sum(
+        intensity_windowed[:, i] = np.mean(
             intensity_segment * window, axis=1
         )  # TODO: reading Cacavelos' thesis, the division by the number of samples is missing here
 
@@ -183,7 +183,7 @@ def convert_bformat_to_intensity(
     """Integrate and compute intensities for a B-format Ambisonics recording.
 
     Args:
-        signal (np.ndarray): input B-format Ambisonics signal.
+        signal (np.ndarray): input B-format Ambisonics signal. Shape: (4, N).
         sample_rate (int): sampling rate of the signal.
         integration_time (int): integration time to apply, in seconds.
         cutoff_frequency (int, optional): cutoff frequency for the low-pass filter. Defaults to 5000 Hz.
@@ -197,7 +197,7 @@ def convert_bformat_to_intensity(
     intensity_directions = (
         signal_filtered[0, :] * signal_filtered[1:, :]
     )  # Intensity = pressure (W channel) * pressure gradient (XYZ channels)
-    intensity_windowed = integrate_bformat_intensities(
+    intensity_windowed = integrate_intensity_directions(
         intensity_directions,
         duration_secs=integration_time,
         sample_rate=sample_rate,
