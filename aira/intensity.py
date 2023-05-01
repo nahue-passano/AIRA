@@ -115,7 +115,7 @@ def integrate_intensity_directions(
         intensity_segment = intensity_directions[:, i : i + duration_samples]
         intensity_windowed[:, i] = np.mean(
             intensity_segment * window, axis=1
-        )  # TODO: reading Cacavelos' thesis, the division by the number of samples is missing here
+        )
 
     return intensity_windowed
 
