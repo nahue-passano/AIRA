@@ -1,5 +1,5 @@
-# 3DAIRA
-3D Ambisonics Impulse Response Analyzer
+# AIRA
+Ambisonics Impulse Response Analyzer
 
 ### TODO
 - [x] Implementar el filtro inverso al sine sweep de entrada por canal
