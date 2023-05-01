@@ -19,3 +19,6 @@ __pycache__/
 *.wav
 *.sh
 *.venv
+
+# Exceptions
+!test/mock_data/*
