@@ -75,7 +75,7 @@ def hamming_window(
     return Ix_vent, Iy_vent, Iz_vent
 
 
-def hamming_window_bformat(
+def integrate_bformat(
     intensity: np.ndarray,
     duration_secs: float,
     sample_rate: int,
@@ -102,8 +102,6 @@ def hamming_window_bformat(
     # Peak scanning: keep only from the highest peak to the end of the signal
     earliest_peak_index = np.argmax(intensity, axis=1).min()
     intensity = intensity[:, earliest_peak_index:]
-
-    breakpoint()
 
     # Windowing
     intensity = np.concatenate(
@@ -200,8 +198,9 @@ def convert_bformat_to_intensity(
     signal_filtered[1:, :] = (
         signal_filtered[0, :] * signal_filtered[1:, :]
     )  # W channel * Other channels
+    # TODO: shouldn't it be a correlation
 
-    intensity_windowed = hamming_window_bformat(
+    intensity_windowed = integrate_bformat(
         signal_filtered[1:, :],  # drop W
         duration_secs=integration_time,
         sample_rate=sample_rate,
