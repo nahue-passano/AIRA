@@ -1,12 +1,27 @@
 import numpy as np
+import soundfile as sf
+from typing import List, Tuple
 
 
-def load_audio():
-    pass
+def read_audio(audio_paths: List[str]) -> Tuple[float, np.ndarray]:
+    """Read audios given a list of audio paths
 
+    Parameters
+    ----------
+    audio_paths : List[str]
+        List of strings containing the audio paths to be loaded
 
-def write_audio():
-    pass
+    Returns
+    -------
+    Tuple[float,np.ndarray]
+        Sample rate of the audios and audios loaded as rows of a np.ndarray
+    """
+    audio_array = []
+    for audio_i in audio_paths:
+        audio_array_i, sample_rate = sf.read(audio_i)
+        audio_array.append(audio_array_i)
+
+    return sample_rate, np.array(audio_array)
 
 
 def pad_to_target(array: np.ndarray, target: np.ndarray) -> np.ndarray:
