@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 import plotly.express as px
 
@@ -21,6 +22,6 @@ def test_get_hedgehog_array():
     masked_intensity, masked_azimuth, masked_elevation = get_hedgehog_arrays(
         intensity, azimuth, elevation
     )
-
-    fig = px.imshow(masked_intensity)
+    t = np.linspace(0, signals.shape[1] / sample_rate, masked_intensity.shape[0])
+    fig = px.line(t, masked_intensity)
     fig.show()
