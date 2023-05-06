@@ -11,7 +11,12 @@ def create_mock_bformat_signal(sample_rate: int, duration_seconds: float) -> np.
 
 
 def load_mocked_bformat():
-    ordered_aformat_channels = ("FLU", "FRD", "BRU", "BLD")  # Assert the ordering is standardized across the project
+    ordered_aformat_channels = (
+        "FLU",
+        "FRD",
+        "BRU",
+        "BLD",
+    )  # Assert the ordering is standardized across the project
     audio_paths = dict(
         FLU="./test/mock_data/soundfield_flu.wav",
         FRD="./test/mock_data/soundfield_frd.wav",
@@ -23,21 +28,13 @@ def load_mocked_bformat():
         for cardioid_channel, path in audio_paths.items()
     }
     audio_signals = [
-        audio_data[channel_name]["signal"]
-        for channel_name in ordered_aformat_channels
+        audio_data[channel_name]["signal"] for channel_name in ordered_aformat_channels
     ]
     sample_rates = [
         audio_data[channel_name]["sample_rate"]
         for channel_name in ("FLU", "FRD", "BRU", "BLD")
     ]
-    assert(len(set(sample_rates)) == 1), "Multiple different sample rates were found"
-    
+    assert len(set(sample_rates)) == 1, "Multiple different sample rates were found"
+
     signals_array = np.array(audio_signals)
     return signals_array, sample_rates[0]
-    
-
-
-if __name__ == "__main__":
-    signal, sample_rate = load_mocked_bformat()
-    print(signal.shape)
-    print(sample_rate)
