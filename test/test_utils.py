@@ -1,11 +1,11 @@
 import soundfile as sf
 
 from aira.utils import read_aformat
-from mock_data.recordings import load_mocked_bformat
+from mock_data.recordings import load_mocked_aformat
 
 
 def test_read_aformat_from_list():
-    expected_signal, expected_sample_rate = load_mocked_bformat()
+    expected_signal, expected_sample_rate = load_mocked_aformat()
     expected_shape = expected_signal.shape
 
     audio_path_list = [
@@ -25,7 +25,7 @@ def test_read_aformat_from_list():
 
 
 def test_read_aformat_from_dict():
-    expected_signal, expected_sample_rate = load_mocked_bformat()
+    expected_signal, expected_sample_rate = load_mocked_aformat()
     expected_shape = expected_signal.shape
 
     audio_paths = dict(
