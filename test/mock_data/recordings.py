@@ -3,6 +3,8 @@ from random import randint
 import numpy as np
 from soundfile import read
 
+from aira.formatter import convert_ambisonics_a_to_b
+
 
 def create_mock_bformat_signal(sample_rate: int, duration_seconds: float) -> np.ndarray:
     return np.random.randint(
@@ -10,7 +12,7 @@ def create_mock_bformat_signal(sample_rate: int, duration_seconds: float) -> np.
     )
 
 
-def load_mocked_bformat():
+def load_mocked_aformat():
     ordered_aformat_channels = (
         "FLU",
         "FRD",
@@ -38,3 +40,12 @@ def load_mocked_bformat():
 
     signals_array = np.array(audio_signals)
     return signals_array, sample_rates[0]
+
+
+def load_mocked_bformat():
+    aformat_signals, sample_rate = load_mocked_aformat()
+    aformat_signals = [
+        aformat_signals[a_channel, :]
+        for a_channel in range(4)
+    ]
+    return convert_ambisonics_a_to_b(aformat_signals), sample_rate
