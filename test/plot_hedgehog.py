@@ -1,3 +1,6 @@
+import os
+from pathlib import Path
+
 import numpy as np
 import pandas as pd
 import plotly.express as px
@@ -25,6 +28,10 @@ fig = hedgehog(
     sample_rate,
     signals.shape[1] / sample_rate
 )
-fig.write_image("hedge.webp", format="webp")
-fig.write_image("hedge.svg", format="svg")
-fig.write_html("hedgehog.html", include_plotlyjs=True)
+outputs_directory = Path("./outputs")
+filename = "hedgehog"
+if not outputs_directory.exists():
+    os.makedirs(outputs_directory)
+fig.write_image(str(outputs_directory / filename) + ".webp", format="webp")
+fig.write_image(str(outputs_directory / filename) + ".svg", format="svg")
+fig.write_html(str(outputs_directory / filename) + ".html", include_plotlyjs=True)
