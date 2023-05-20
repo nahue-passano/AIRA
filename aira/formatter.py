@@ -1,7 +1,7 @@
 """3D format conversion for coordinates and Ambisonics"""
 
 from functools import singledispatch
-from typing import List, Tuple
+from typing import List, Tuple, Union
 
 import numpy as np
 
@@ -77,22 +77,22 @@ def _(aformat_channels: List[np.ndarray]) -> np.ndarray:
 
 
 def convert_polar_to_cartesian(
-    radius: float | np.ndarray,
-    azimuth: float | np.ndarray,
-    elevation: float | np.ndarray,
-) -> Tuple[float | np.ndarray, float | np.ndarray, float | np.ndarray]:
+    radius: Union[float, np.ndarray],
+    azimuth: Union[float, np.ndarray],
+    elevation: Union[float, np.ndarray],
+) -> Tuple[Union[float, np.ndarray]]:
     """Convert three 3D polar coordinates to Cartesian ones.
-    
+
     Parameters
         radius: float | np.ndarray. The radii (or rho).
         azimuth: float | np.ndarray. The azimuth (also called theta or alpha).
         elevation: float | np.ndarray. The elevation (also called phi or polar).
-    
+
     Returns
         (x, y, z): Tuple[float | np.ndarray]. The corresponding Cartesian coordinates.
     """
     return (
         radius * np.cos(azimuth) * np.sin(elevation),
         radius * np.sin(azimuth) * np.sin(elevation),
-        radius * np.cos(elevation)
+        radius * np.cos(elevation),
     )
