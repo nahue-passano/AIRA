@@ -8,6 +8,7 @@ import pytest
 from mock_data.recordings import load_mocked_bformat
 
 from aira.intensity import convert_bformat_to_intensity
+from aira.formatter import convert_polar_to_cartesian
 from aira.reflections import (
     CorrelationReflectionDetectionStrategy,
     ThresholdReflectionDetectionStrategy,
@@ -68,7 +69,7 @@ def test_neighbor_reflection_detection():
 def test_get_hedgehog_array():
     """WHEN creating the data for a hedgehog plot
     GIVEN valid intensity, azimuth and elevation arrays
-    THEN
+    THEN lengths of the arrays must be equal
     """
 
     signals, sample_rate = load_mocked_bformat()
@@ -85,15 +86,3 @@ def test_get_hedgehog_array():
     assert len(masked_intensity) == len(
         masked_elevation
     ), "Intensity and elevation's length must be the same"
-
-    time_axis = np.linspace(0, signals.shape[1] / sample_rate, masked_intensity.shape[0])
-    plot_df = pd.DataFrame(
-        {
-            "time": time_axis,
-            "intensity": masked_intensity,
-            "azimuth": masked_azimuth,
-            "elevation": masked_elevation,
-        }
-    )  # Plotly requires a dataframe input
-    fig = px.line(plot_df, x="time", y="intensity")
-    fig.show()
