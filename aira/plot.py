@@ -1,3 +1,5 @@
+"""Plotting functions."""
+
 import numpy as np
 import pandas as pd
 import plotly.express as px
@@ -12,12 +14,14 @@ def hedgehog(
     sample_rate: int,
     rir_duration_seconds: float,
 ):
+    """Create a hedgehog plot."""
     time_axis = np.linspace(
         0, rir_duration_seconds / sample_rate, reflections_intensity.shape[0]
     )
+    # pylint: disable=invalid-name
     x, y, z = convert_polar_to_cartesian(
         reflections_intensity, reflections_azimuth, reflections_elevation
-    )  # pylint: disable=invalid-name
+    )
     plot_df = pd.DataFrame(
         dict(
             time=time_axis,

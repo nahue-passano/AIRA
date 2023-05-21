@@ -1,10 +1,12 @@
+"""Audio utilities"""
+
 from functools import singledispatch
 from pathlib import Path
 from traceback import print_exc
+from typing import Dict, List, Tuple, Union
 
 import numpy as np
 import soundfile as sf
-from typing import Dict, List, Tuple, Union
 
 
 @singledispatch
@@ -24,10 +26,11 @@ def read_aformat(audio_path: Union[str, Path]) -> Tuple[np.ndarray, float]:
     """
     signal, sample_rate = sf.read(audio_path)
     signal = signal.T
-    assert (
-        signal.shape[0] == 4
-    ), f"Audio file {str(audio_path)} with shape {signal.shape} does not contain 4 channels, so it cannot be A-format Ambisonics"
-    return
+    assert signal.shape[0] == 4, (
+        f"Audio file {str(audio_path)} with shape {signal.shape} does not"
+        f"contain 4 channels, so it cannot be A-format Ambisonics"
+    )
+    return signal, sample_rate
 
 
 @read_aformat.register(list)
@@ -55,9 +58,11 @@ def _(audio_paths: List[str]) -> Tuple[np.ndarray, float]:
 
     audio_array = []
     for audio_i in audio_paths:
-        # TODO: implement try-catch for concrete exceptions of soundfile
-        audio_array_i, sample_rate = sf.read(audio_i)
-        audio_array.append(audio_array_i)
+        try:
+            audio_array_i, sample_rate = sf.read(audio_i)
+            audio_array.append(audio_array_i)
+        except sf.SoundFileError:
+            print_exc()
 
     return np.array(audio_array), sample_rate
 
@@ -106,8 +111,7 @@ def _(audio_paths: Dict[str, str]):
 
         signals_array = np.array(audio_signals)
         return signals_array, sample_rates[0]
-    except:
-        # TODO: implement for concrete exceptions of soundfile
+    except sf.SoundFileError:
         print_exc()
 
 

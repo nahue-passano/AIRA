@@ -1,32 +1,47 @@
+"""Functionality for detecting reflections in a room impulse response (RIR)."""
+
+from abc import ABC, abstractmethod
 from enum import Enum
-from abc import ABC, abstractstaticmethod
 from typing import Tuple, Union
 
 import numpy as np
 from scipy.signal import find_peaks
 
-from aira.intensity import convert_bformat_to_intensity
 
-
+# pylint: disable=too-few-public-methods
 class ReflectionDetectionStrategy(ABC):
-    @abstractstaticmethod
+    """Base interface for a reflection detection algorithm."""
+
+    @abstractmethod
+    @staticmethod
     def get_indeces_of_reflections(intensity_magnitude: np.ndarray) -> np.ndarray:
-        pass
+        """Abstract method to be overwritten by concrete implementations of
+        reflection detection."""
 
 
+# pylint: disable=too-few-public-methods
 class CorrelationReflectionDetectionStrategy(ReflectionDetectionStrategy):
+    """Algorithm for detecting reflections based on the correlation."""
+
     @staticmethod
     def get_indeces_of_reflections(intensity_magnitude: np.ndarray) -> np.ndarray:
         raise NotImplementedError("Implemented method is Scipy's find_peaks")
 
 
+# pylint: disable=too-few-public-methods
 class ThresholdReflectionDetectionStrategy(ReflectionDetectionStrategy):
+    """Algorithm for detecting reflections based on a threshold."""
+
     @staticmethod
     def get_indeces_of_reflections(intensity_magnitude: np.ndarray) -> np.ndarray:
         raise NotImplementedError("Implemented method is Scipy's find_peaks")
 
 
+# pylint: disable=too-few-public-methods
 class NeighborReflectionDetectionStrategy(ReflectionDetectionStrategy):
+    """Algorithm for detecting reflections based on the surrounding values
+    of local maxima."""
+
     @staticmethod
     def get_indeces_of_reflections(intensity_magnitude: np.ndarray) -> np.ndarray:
         """Find local maxima in the intensity magnitude signal.
@@ -42,6 +57,8 @@ class NeighborReflectionDetectionStrategy(ReflectionDetectionStrategy):
 
 
 class ReflectionDetectionStrategies(Enum):
+    """Enum class for accessing the existing `ReflectionDetectionStrategy`s"""
+
     CORRELATION = CorrelationReflectionDetectionStrategy
     THRESHOLD = ThresholdReflectionDetectionStrategy
     SCIPY = NeighborReflectionDetectionStrategy

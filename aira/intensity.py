@@ -1,8 +1,9 @@
+"""Functionality for intensity computation and related signal processing."""
+
 from typing import Tuple
 
 import numpy as np
-from scipy.signal import kaiserord, lfilter, firwin
-
+from scipy.signal import firwin, kaiserord, lfilter
 
 FILTER_CUTOFF = 5000
 FILTER_TRANSITION_WIDTH_HZ = 250.0
@@ -58,6 +59,17 @@ def integrate_intensity_directions(
 def apply_low_pass_filter(
     signal: np.ndarray, cutoff_frequency: int, sample_rate: int
 ) -> np.ndarray:
+    """Filter a signal at the given cutoff with an optimized number of taps
+    (order of the filter).
+
+    Args:
+        signal (np.ndarray): signal to filter.
+        cutoff_frequency (int): cutoff frequency.
+        sample_rate (int): sample rate of the signal.
+
+    Returns:
+        np.ndarray: filtered signal.
+    """
     nyquist_rate = sample_rate / 2.0
 
     # Compute FIR filter parameters and apply to signal.
@@ -84,7 +96,8 @@ def convert_bformat_to_intensity(
         signal (np.ndarray): input B-format Ambisonics signal. Shape: (4, N).
         sample_rate (int): sampling rate of the signal.
         integration_time (int): integration time to apply, in seconds.
-        cutoff_frequency (int, optional): cutoff frequency for the low-pass filter. Defaults to 5000 Hz.
+        cutoff_frequency (int, optional): cutoff frequency for the low-pass
+        filter. Defaults to 5000 Hz.
 
     Returns:
         Tuple[np.ndarray]: integrated intensity, azimuth and elevation.
