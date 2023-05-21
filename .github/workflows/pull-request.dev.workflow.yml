@@ -27,6 +27,9 @@ jobs:
         create-virtualenv: true
     - name: Install dependencies
       run: poetry install
+    - name: Sort dependency imports
+      run: |
+        poetry run isort $(git ls-files '*.py')
     - name: Code style
       run: |
         poetry run black $(git ls-files '*.py')
