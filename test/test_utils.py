@@ -1,10 +1,15 @@
-import soundfile as sf
+"""Unit tests for the audio utility functions module."""
+
+from mock_data.recordings import (
+    aformat_signal_and_samplerate,
+)  # pylint: disable=unused-import
 
 from aira.utils import read_aformat
-from mock_data.recordings import aformat_signal_and_samplerate
 
 
-def test_read_aformat_from_list(aformat_signal_and_samplerate):
+def test_read_aformat_from_list(
+    aformat_signal_and_samplerate,
+):  # pylint: disable=redefined-outer-name
     """WHEN trying to read an A-format Ambisonics recording, GIVEN the channels
     are passed as a list to the reading function, THEN call the corresponding
     overloaded function.
@@ -14,7 +19,10 @@ def test_read_aformat_from_list(aformat_signal_and_samplerate):
         a tuple with an array of A-format Ambisonics signals (1 row per channel)
         and their sample rate in the second element of the tuple.
     """
-    expected_signal, expected_sample_rate = aformat_signal_and_samplerate
+    (
+        expected_signal,
+        expected_sample_rate,
+    ) = aformat_signal_and_samplerate  # pylint: disable=unpacking-non-sequence
     expected_shape = expected_signal.shape
 
     audio_path_list = [
@@ -23,7 +31,9 @@ def test_read_aformat_from_list(aformat_signal_and_samplerate):
         "./test/mock_data/soundfield_bru.wav",
         "./test/mock_data/soundfield_bld.wav",
     ]
-    audio_array, sample_rate = read_aformat(audio_path_list)
+    audio_array, sample_rate = read_aformat(
+        audio_path_list
+    )  # pylint: disable=unpacking-non-sequence
 
     assert (
         expected_shape == audio_array.shape
@@ -33,7 +43,9 @@ def test_read_aformat_from_list(aformat_signal_and_samplerate):
     ), f"Output sample rate: {sample_rate} != Expected sample rate: {expected_sample_rate}"
 
 
-def test_read_aformat_from_dict(aformat_signal_and_samplerate):
+def test_read_aformat_from_dict(
+    aformat_signal_and_samplerate,
+):  # pylint: disable=redefined-outer-name
     """WHEN trying to read an A-format Ambisonics recording, GIVEN the channels
     are passed as a dictionary to the reading function, THEN call the
     corresponding overloaded function.
@@ -43,16 +55,21 @@ def test_read_aformat_from_dict(aformat_signal_and_samplerate):
         a tuple with an array of A-format Ambisonics signals (1 row per channel)
         and their sample rate in the second element of the tuple.
     """
-    expected_signal, expected_sample_rate = aformat_signal_and_samplerate
+    (
+        expected_signal,
+        expected_sample_rate,
+    ) = aformat_signal_and_samplerate  # pylint: disable=unpacking-non-sequence
     expected_shape = expected_signal.shape
 
-    audio_paths = dict(
+    audio_paths = dict(  # pylint: disable=use-dict-literal
         front_left_up="./test/mock_data/soundfield_flu.wav",
         front_right_down="./test/mock_data/soundfield_frd.wav",
         back_right_up="./test/mock_data/soundfield_bru.wav",
         back_left_down="./test/mock_data/soundfield_bld.wav",
     )
-    audio_array, sample_rate = read_aformat(audio_paths)
+    audio_array, sample_rate = read_aformat(
+        audio_paths
+    )  # pylint: disable=unpacking-non-sequence
 
     assert (
         expected_shape == audio_array.shape

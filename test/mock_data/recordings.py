@@ -1,4 +1,4 @@
-from random import randint
+"""Mocked signals for use in unit tests."""
 
 import numpy as np
 import pytest
@@ -26,7 +26,7 @@ def aformat_signal_and_samplerate() -> tuple:
         "BRU",
         "BLD",
     )  # Assert the ordering is standardized across the project
-    audio_paths = dict(
+    audio_paths = dict(  # pylint: disable=use-dict-literal
         FLU="./test/mock_data/soundfield_flu.wav",
         FRD="./test/mock_data/soundfield_frd.wav",
         BRU="./test/mock_data/soundfield_bru.wav",
@@ -50,10 +50,15 @@ def aformat_signal_and_samplerate() -> tuple:
 
 
 @pytest.fixture
-def bformat_signal_and_samplerate(aformat_signal_and_samplerate: tuple):
+def bformat_signal_and_samplerate(
+    aformat_signal_and_samplerate: tuple,
+):  # pylint: disable=redefined-outer-name
     """Return a tuple with an array of W, X, Y and Z channels, one
     for each of the 4 rows, in the first element of the tuple, and the sample
     rate of the recording in the second element of the tuple."""
     aformat_signals, sample_rate = aformat_signal_and_samplerate
     aformat_signals = [aformat_signals[a_channel, :] for a_channel in range(4)]
-    return convert_ambisonics_a_to_b(aformat_signals), sample_rate
+    return (
+        convert_ambisonics_a_to_b(aformat_signals),
+        sample_rate,
+    )  # pylint: disable=no-value-for-parameter

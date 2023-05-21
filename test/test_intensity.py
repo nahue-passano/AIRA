@@ -1,15 +1,30 @@
+"""Unit tests for the intensity module."""
+
 from math import ceil
 
-from aira.intensity import convert_bformat_to_intensity
 from mock_data.recordings import (
+    aformat_signal_and_samplerate,  # pylint: disable=unused-import
     bformat_signal_and_samplerate,
-    aformat_signal_and_samplerate,
 )
 
+from aira.intensity import convert_bformat_to_intensity
 
-def test_conversion_to_intensity(bformat_signal_and_samplerate: tuple):
+
+def test_conversion_to_intensity(
+    bformat_signal_and_samplerate: tuple,
+):  # pylint: disable=redefined-outer-name
+    """WHEN computing the intensity GIVEN a B-format signal, THEN the output
+    is of reasonable shape.
+
+    Args:
+        bformat_signal_and_samplerate (tuple): a pytest fixture that returns a
+        B-format array and its sample rate.
+    """
     integration_time = 0.25
-    signal_bformat, sample_rate = bformat_signal_and_samplerate
+    (
+        signal_bformat,
+        sample_rate,
+    ) = bformat_signal_and_samplerate  # pylint: disable=unpacking-non-sequence
     intensity, _, _ = convert_bformat_to_intensity(
         signal_bformat, sample_rate, integration_time, 4000
     )
