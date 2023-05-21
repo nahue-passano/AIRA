@@ -1,8 +1,8 @@
 """Unit tests for the audio utility functions module."""
 
-from mock_data.recordings import (
+from mock_data.recordings import (  # pylint: disable=unused-import
     aformat_signal_and_samplerate,
-)  # pylint: disable=unused-import
+)
 
 from aira.utils import read_aformat
 
@@ -31,9 +31,9 @@ def test_read_aformat_from_list(
         "./test/mock_data/soundfield_bru.wav",
         "./test/mock_data/soundfield_bld.wav",
     ]
-    audio_array, sample_rate = read_aformat(
+    audio_array, sample_rate = read_aformat(  # pylint: disable=unpacking-non-sequence
         audio_path_list
-    )  # pylint: disable=unpacking-non-sequence
+    )
 
     assert (
         expected_shape == audio_array.shape
@@ -67,9 +67,9 @@ def test_read_aformat_from_dict(
         back_right_up="./test/mock_data/soundfield_bru.wav",
         back_left_down="./test/mock_data/soundfield_bld.wav",
     )
-    audio_array, sample_rate = read_aformat(
+    audio_array, sample_rate = read_aformat(  # pylint: disable=unpacking-non-sequence
         audio_paths
-    )  # pylint: disable=unpacking-non-sequence
+    )
 
     assert (
         expected_shape == audio_array.shape

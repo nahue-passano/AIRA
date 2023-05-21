@@ -3,8 +3,8 @@
 import numpy as np
 import pytest
 from mock_data.intensity import intensity_azimuth_elevation
-from mock_data.recordings import (
-    aformat_signal_and_samplerate,  # pylint: disable=unused-import
+from mock_data.recordings import (  # pylint: disable=unused-import
+    aformat_signal_and_samplerate,
     bformat_signal_and_samplerate,
 )
 

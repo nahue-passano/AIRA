@@ -59,6 +59,7 @@ def bformat_signal_and_samplerate(
     aformat_signals, sample_rate = aformat_signal_and_samplerate
     aformat_signals = [aformat_signals[a_channel, :] for a_channel in range(4)]
     return (
+        # pylint: disable=no-value-for-parameter
         convert_ambisonics_a_to_b(aformat_signals),
         sample_rate,
-    )  # pylint: disable=no-value-for-parameter
+    )

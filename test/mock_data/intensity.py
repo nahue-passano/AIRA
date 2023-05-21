@@ -2,8 +2,8 @@
 
 import pytest
 
-from mock_data.recordings import (
-    aformat_signal_and_samplerate,  # pylint: disable=unused-import
+from mock_data.recordings import (  # pylint: disable=unused-import
+    aformat_signal_and_samplerate,
     bformat_signal_and_samplerate,
 )
 
@@ -12,8 +12,8 @@ from aira.intensity import convert_bformat_to_intensity
 
 @pytest.fixture
 def intensity_azimuth_elevation(
-    bformat_signal_and_samplerate: tuple,
-) -> tuple:  # pylint: disable=redefined-outer-name
+    bformat_signal_and_samplerate: tuple,  # pylint: disable=redefined-outer-name
+) -> tuple:
     """Return mocked data for smoothed intensity, azimuth and elevation, along
     with the sample rate and integration time.
 
