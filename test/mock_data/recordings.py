@@ -1,18 +1,25 @@
 from random import randint
 
 import numpy as np
+import pytest
 from soundfile import read
 
 from aira.formatter import convert_ambisonics_a_to_b
 
 
-def create_mock_bformat_signal(sample_rate: int, duration_seconds: float) -> np.ndarray:
+@pytest.fixture
+def bformat_signal_random(sample_rate: int, duration_seconds: float) -> np.ndarray:
+    """Return a random array of 4 rows corresponding to W, X, Y and Z channels."""
     return np.random.randint(
         -32767, 32768, size=(4, round(sample_rate * duration_seconds)), dtype=np.int16
     )
 
 
-def load_mocked_aformat():
+@pytest.fixture
+def aformat_signal_and_samplerate() -> tuple:
+    """Return a tuple with an array of FLU, FRD, BRU and BLD channels, one
+    for each of the 4 rows, in the first element of the tuple, and the sample
+    rate of the recording in the second element of the tuple."""
     ordered_aformat_channels = (
         "FLU",
         "FRD",
@@ -42,10 +49,11 @@ def load_mocked_aformat():
     return signals_array, sample_rates[0]
 
 
-def load_mocked_bformat():
-    aformat_signals, sample_rate = load_mocked_aformat()
-    aformat_signals = [
-        aformat_signals[a_channel, :]
-        for a_channel in range(4)
-    ]
+@pytest.fixture
+def bformat_signal_and_samplerate(aformat_signal_and_samplerate: tuple):
+    """Return a tuple with an array of W, X, Y and Z channels, one
+    for each of the 4 rows, in the first element of the tuple, and the sample
+    rate of the recording in the second element of the tuple."""
+    aformat_signals, sample_rate = aformat_signal_and_samplerate
+    aformat_signals = [aformat_signals[a_channel, :] for a_channel in range(4)]
     return convert_ambisonics_a_to_b(aformat_signals), sample_rate

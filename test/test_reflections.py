@@ -5,7 +5,10 @@ import pandas as pd
 import plotly.express as px
 import pytest
 
-from mock_data.recordings import load_mocked_bformat
+from mock_data.recordings import (
+    aformat_signal_and_samplerate,
+    bformat_signal_and_samplerate,
+)
 
 from aira.intensity import convert_bformat_to_intensity
 from aira.formatter import convert_polar_to_cartesian
@@ -17,12 +20,18 @@ from aira.reflections import (
 )
 
 
-def test_correlation_reflection_detection_strategy():
+def test_correlation_reflection_detection_strategy(
+    bformat_signal_and_samplerate: tuple,
+):
     """WHEN extracting reflections with the CorrelationReflectionDetectionStrategy
     GIVEN that the strategy is not implemented yet
     THEN raise a NotImplementedError.
+
+    Parameters
+        bformat_signal_and_samplerate: tuple. A PyTest fixture. It gets
+        interpolated automatically.
     """
-    signals, sample_rate = load_mocked_bformat()
+    signals, sample_rate = bformat_signal_and_samplerate
     intensity, _, _ = convert_bformat_to_intensity(signals, sample_rate, 0.01, 4000)
     intensity_magnitude = 20 * np.log(intensity)
     with pytest.raises(NotImplementedError):
@@ -31,12 +40,16 @@ def test_correlation_reflection_detection_strategy():
         )
 
 
-def test_threshold_reflection_detection():
+def test_threshold_reflection_detection(bformat_signal_and_samplerate: tuple):
     """WHEN extracting reflections with the ThresholdReflectionDetectionStrategy
     GIVEN that the strategy is not implemented yet
     THEN raise a NotImplementedError.
+
+    Parameters
+        bformat_signal_and_samplerate: tuple. A PyTest fixture. It gets
+        interpolated automatically.
     """
-    signals, sample_rate = load_mocked_bformat()
+    signals, sample_rate = bformat_signal_and_samplerate
     intensity, _, _ = convert_bformat_to_intensity(signals, sample_rate, 0.01, 4000)
     intensity_magnitude = 20 * np.log(intensity)
     with pytest.raises(NotImplementedError):
@@ -45,12 +58,17 @@ def test_threshold_reflection_detection():
         )
 
 
-def test_neighbor_reflection_detection():
+def test_neighbor_reflection_detection(bformat_signal_and_samplerate: tuple):
     """WHEN getting the indeces of the reflections with the NeighborReflectionDetectionStrategy
     GIVEN a valid intensity
-    THEN return an array with the reflections indeces"""
+    THEN return an array with the reflections indeces
 
-    signals, sample_rate = load_mocked_bformat()
+    Parameters
+        bformat_signal_and_samplerate: tuple. A PyTest fixture. It gets
+        interpolated automatically.
+    """
+
+    signals, sample_rate = bformat_signal_and_samplerate
     intensity, _, _ = convert_bformat_to_intensity(signals, sample_rate, 0.01, 4000)
     intensity_magnitude = 20 * np.log(intensity)
 
@@ -66,13 +84,17 @@ def test_neighbor_reflection_detection():
     THEN return an array with the reflections indeces"""
 
 
-def test_get_hedgehog_array():
+def test_get_hedgehog_array(bformat_signal_and_samplerate: tuple):
     """WHEN creating the data for a hedgehog plot
     GIVEN valid intensity, azimuth and elevation arrays
     THEN lengths of the arrays must be equal
+
+    Parameters
+        bformat_signal_and_samplerate: tuple. A PyTest fixture. It gets
+        interpolated automatically.
     """
 
-    signals, sample_rate = load_mocked_bformat()
+    signals, sample_rate = bformat_signal_and_samplerate
     intensity, azimuth, elevation = convert_bformat_to_intensity(
         signals, sample_rate, 0.01, 4000
     )

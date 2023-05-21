@@ -10,10 +10,10 @@ from aira.intensity import convert_bformat_to_intensity
 from aira.plot import hedgehog
 from aira.reflections import get_hedgehog_arrays
 
-from mock_data.recordings import load_mocked_bformat
+from mock_data.recordings import bformat_signal_and_samplerate
 
 
-signals, sample_rate = load_mocked_bformat()
+signals, sample_rate = bformat_signal_and_samplerate()
 intensity, azimuth, elevation = convert_bformat_to_intensity(
     signals, sample_rate, 0.01, 4000
 )
@@ -26,7 +26,7 @@ fig = hedgehog(
     masked_azimuth,
     masked_elevation,
     sample_rate,
-    signals.shape[1] / sample_rate
+    signals.shape[1] / sample_rate,
 )
 outputs_directory = Path("./outputs")
 filename = "hedgehog"

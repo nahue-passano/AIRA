@@ -36,7 +36,7 @@ def hedgehog(
         y="y",
         z="z",
         color="intensity",
-        color_discrete_sequence=px.colors.sequential.Bluered
+        color_discrete_sequence=px.colors.sequential.Bluered,
     )
     fig.show()
     return fig

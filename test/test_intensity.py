@@ -1,17 +1,16 @@
 from math import ceil
 
 from aira.intensity import convert_bformat_to_intensity
-from mock_data.recordings import create_mock_bformat_signal, load_mocked_bformat
+from mock_data.recordings import (
+    bformat_signal_and_samplerate,
+    aformat_signal_and_samplerate,
+)
 
 
-def test_conversion_to_intensity():
+def test_conversion_to_intensity(bformat_signal_and_samplerate: tuple):
     integration_time = 0.25
-    # sample_rate = 48000
-    # signal_bformat = create_mock_bformat_signal(
-    #     sample_rate=sample_rate, duration_seconds=5
-    # )
-    signal_bformat, sample_rate = load_mocked_bformat()
-    intensity, azimuth, elevation = convert_bformat_to_intensity(
+    signal_bformat, sample_rate = bformat_signal_and_samplerate
+    intensity, _, _ = convert_bformat_to_intensity(
         signal_bformat, sample_rate, integration_time, 4000
     )
 

@@ -1,11 +1,20 @@
 import soundfile as sf
 
 from aira.utils import read_aformat
-from mock_data.recordings import load_mocked_aformat
+from mock_data.recordings import aformat_signal_and_samplerate
 
 
-def test_read_aformat_from_list():
-    expected_signal, expected_sample_rate = load_mocked_aformat()
+def test_read_aformat_from_list(aformat_signal_and_samplerate):
+    """WHEN trying to read an A-format Ambisonics recording, GIVEN the channels
+    are passed as a list to the reading function, THEN call the corresponding
+    overloaded function.
+
+    Args:
+        aformat_signal_and_samplerate (tuple): a PyTest fixture which returns
+        a tuple with an array of A-format Ambisonics signals (1 row per channel)
+        and their sample rate in the second element of the tuple.
+    """
+    expected_signal, expected_sample_rate = aformat_signal_and_samplerate
     expected_shape = expected_signal.shape
 
     audio_path_list = [
@@ -24,8 +33,17 @@ def test_read_aformat_from_list():
     ), f"Output sample rate: {sample_rate} != Expected sample rate: {expected_sample_rate}"
 
 
-def test_read_aformat_from_dict():
-    expected_signal, expected_sample_rate = load_mocked_aformat()
+def test_read_aformat_from_dict(aformat_signal_and_samplerate):
+    """WHEN trying to read an A-format Ambisonics recording, GIVEN the channels
+    are passed as a dictionary to the reading function, THEN call the
+    corresponding overloaded function.
+
+    Args:
+        aformat_signal_and_samplerate (tuple): a PyTest fixture which returns
+        a tuple with an array of A-format Ambisonics signals (1 row per channel)
+        and their sample rate in the second element of the tuple.
+    """
+    expected_signal, expected_sample_rate = aformat_signal_and_samplerate
     expected_shape = expected_signal.shape
 
     audio_paths = dict(
@@ -42,4 +60,3 @@ def test_read_aformat_from_dict():
     assert (
         expected_sample_rate == sample_rate
     ), f"Output sample rate: {sample_rate} != Expected sample rate: {expected_sample_rate}"
-
