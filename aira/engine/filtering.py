@@ -2,90 +2,21 @@
 
 import numpy as np
 import scipy.signal as sc
+from scipy.signal import bilinear, firwin, kaiserord, lfilter
 
+MIC2CENTER = 3
 SOUND_SPEED = 340
-
-
-def generate_log_sine_sweep(
-    sample_rate: int, duration: float, frequency_min: float, frequency_max: float
-) -> np.ndarray:
-    """Generates Log-Sinesweep given minimum and maximum frequencies
-
-    Parameters
-    ----------
-    sample_rate : int
-        Sample rate of the Log-Sinesweep
-    duration : int
-        Lenght in seconds of the Log-Sinesweep
-    frequency_min : float
-        Minimum frequency at time=0
-    frequency_max : float
-        Maximum frequency at time=duration
-
-    Returns
-    -------
-    np.ndarray
-        Array with the Log-Sinesweep
-    """
-
-    # Time array
-    time = np.arange(0, duration, 1 / sample_rate)
-
-    log_sine_sweep = sc.chirp(
-        t=time, f0=frequency_min, t1=duration, f1=frequency_max, method="logarithmic"
-    )
-
-    return log_sine_sweep
-
-
-def generate_lss_inverse_filter(
-    log_sine_sweep: np.ndarray,
-    sample_rate: int,
-    frequency_min: float,
-    frequency_max: float,
-) -> np.ndarray:
-    """Generates the inverse filter given a Log-Sinesweep in time domain
-
-    Parameters
-    ----------
-    log_sine_sweep : np.ndarray
-        Array containing Log-Sinesweep
-    sample_rate : int
-        Sample rate of the Log-Sinesweep
-    frequency_min : float
-        Minimum frequency of the Log-Sinesweep
-    frequency_max : float
-        Maximum frequency of the Log-Sinesweep
-
-    Returns
-    -------
-    np.ndarray
-        Inverse filter of the Log-Sinesweep in time domain
-    """
-
-    # Time array
-    time = np.arange(len(log_sine_sweep)) / sample_rate
-    duration = time[-1]
-
-    # Generate inverse filter from log sine sweep
-    inv_lss = log_sine_sweep[::-1]
-    modulation = 1 / (
-        2 * np.pi * np.exp(time * np.log(frequency_max / frequency_min) / duration)
-    )
-    inv_lss_filter = inv_lss * modulation
-    inv_lss_filter /= abs(inv_lss_filter).max()
-
-    return inv_lss_filter
+FILTER_TRANSITION_WIDTH_HZ = 250.0
+FILTER_RIPPLE_DB = 60.0
 
 
 class NonCoincidentMicsCorrection:
     """Class for correct frequency response in Ambisonics B-format representation."""
 
-    def __init__(
-        self, mic2center: float, sample_rate: int, sound_speed: float = SOUND_SPEED
-    ) -> None:
-        self.mic2center = mic2center / 100
+    def __init__(self, sample_rate: int, mic2center: float = MIC2CENTER,
+                 sound_speed: float = SOUND_SPEED) -> None:
         self.sample_rate = sample_rate
+        self.mic2center = mic2center / 100
         self.sound_speed = sound_speed
         self.delay2center = self.mic2center / self.sound_speed
 
@@ -115,19 +46,19 @@ class NonCoincidentMicsCorrection:
         """
 
         # Analog to digital filter conversion
-        zeros, poles = sc.bilinear(b, a, self.sample_rate)
+        zeros, poles = bilinear(b, a, self.sample_rate)
 
         # Filtering
-        array_filtered = sc.lfilter(zeros, poles, array)
+        array_filtered = lfilter(zeros, poles, array)
 
         return array_filtered
 
-    def correct_axis(self, axis_array: np.ndarray) -> np.ndarray:
+    def correct_axis(self, axis_signal: np.ndarray) -> np.ndarray:
         """Applies correction filter to axis array signal
 
         Parameters
         ----------
-        axis_array : np.ndarray
+        axis_signal : np.ndarray
             Array containing axis signal
 
         Returns
@@ -143,16 +74,16 @@ class NonCoincidentMicsCorrection:
         # pylint: disable=invalid-name
         a = np.array([1, 1j * (1 / 3) * self.delay2center])
 
-        axis_corrected = self._filter(b, a, axis_array)
+        axis_corrected = self._filter(b, a, axis_signal)
 
         return axis_corrected
 
-    def correct_omni(self, omni_array: np.ndarray) -> np.ndarray:
+    def correct_omni(self, omni_signal: np.ndarray) -> np.ndarray:
         """Applies correction filter to omnidirectional array signal
 
         Parameters
         ----------
-        omni_array : np.ndarray
+        omni_signal : np.ndarray
             Array containing omnidirectional signal
 
         Returns
@@ -166,9 +97,37 @@ class NonCoincidentMicsCorrection:
         # pylint: disable=invalid-name
         a = np.array([1, 1j * (1 / 3) * self.delay2center])
 
-        omni_corrected = self._filter(b, a, omni_array)
+        omni_corrected = self._filter(b, a, omni_signal)
 
         return omni_corrected
+
+
+def apply_low_pass_filter(
+    signal: np.ndarray, cutoff_frequency: int, sample_rate: int
+) -> np.ndarray:
+    """Filter a signal at the given cutoff with an optimized number of taps
+    (order of the filter).
+
+    Args:
+        signal (np.ndarray): signal to filter.
+        cutoff_frequency (int): cutoff frequency.
+        sample_rate (int): sample rate of the signal.
+
+    Returns:
+        np.ndarray: filtered signal.
+    """
+    nyquist_rate = sample_rate / 2.0
+
+    # Compute FIR filter parameters and apply to signal.
+    transition_width_normalized = FILTER_TRANSITION_WIDTH_HZ / nyquist_rate
+    filter_length, filter_beta = kaiserord(
+        FILTER_RIPPLE_DB, transition_width_normalized
+    )
+    filter_coefficients = firwin(
+        filter_length, cutoff_frequency / nyquist_rate, window=("kaiser", filter_beta)
+    )
+
+    return lfilter(filter_coefficients, 1.0, signal)
 
 
 def convolve(signal_1: np.ndarray, signal_2: np.ndarray) -> np.ndarray:
