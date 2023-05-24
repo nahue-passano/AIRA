@@ -13,8 +13,12 @@ FILTER_RIPPLE_DB = 60.0
 class NonCoincidentMicsCorrection:
     """Class for correct frequency response in Ambisonics B-format representation."""
 
-    def __init__(self, sample_rate: int, mic2center: float = MIC2CENTER,
-                 sound_speed: float = SOUND_SPEED) -> None:
+    def __init__(
+        self,
+        sample_rate: int,
+        mic2center: float = MIC2CENTER,
+        sound_speed: float = SOUND_SPEED,
+    ) -> None:
         self.sample_rate = sample_rate
         self.mic2center = mic2center / 100
         self.sound_speed = sound_speed

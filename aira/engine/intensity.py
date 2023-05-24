@@ -9,7 +9,6 @@ from aira.engine.filtering import apply_low_pass_filter
 FILTER_CUTOFF = 5000
 
 
-
 def integrate_intensity_directions(
     intensity_directions: np.ndarray,
     duration_secs: float,
