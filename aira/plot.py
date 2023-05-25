@@ -31,7 +31,7 @@ def hedgehog(
             x=x,
             y=y,
             z=z,
-        )
+        )  # pylint: disable=use-dict-literal
     )  # Plotly requires a dataframe input
     plot_df.intensity = plot_df.intensity.astype(float)
     fig = px.line_3d(

@@ -69,9 +69,7 @@ class Ui_MainWindow(object):
         font = QtGui.QFont()
         font.setPointSize(10)
         self.lineEdit.setFont(font)
-        self.lineEdit.setStyleSheet("background-color: rgb(255, 255, 255);\n"
-"\n"
-"")
+        self.lineEdit.setStyleSheet("background-color: rgb(255, 255, 255);\n" "\n" "")
         self.lineEdit.setObjectName("lineEdit")
         self.verticalLayout_6.addWidget(self.lineEdit)
         self.label_6 = QtWidgets.QLabel(self.frame_10)
@@ -84,9 +82,7 @@ class Ui_MainWindow(object):
         font = QtGui.QFont()
         font.setPointSize(10)
         self.lineEdit_2.setFont(font)
-        self.lineEdit_2.setStyleSheet("background-color: rgb(255, 255, 255);\n"
-"\n"
-"")
+        self.lineEdit_2.setStyleSheet("background-color: rgb(255, 255, 255);\n" "\n" "")
         self.lineEdit_2.setText("")
         self.lineEdit_2.setObjectName("lineEdit_2")
         self.verticalLayout_6.addWidget(self.lineEdit_2)
@@ -95,16 +91,18 @@ class Ui_MainWindow(object):
         font = QtGui.QFont()
         font.setPointSize(15)
         self.pushButton_3.setFont(font)
-        self.pushButton_3.setStyleSheet("QPushButton{\n"
-"    border: 2px solid rgb(69, 113, 213);\n"
-"    border-radius: 10px;\n"
-"    background: rgb(69, 113, 213);\n"
-"    color: rgb(255, 255, 255)\n"
-"}\n"
-"QPushButton:hover{\n"
-"    border: rgb(96, 133, 213);\n"
-"    background: rgb(96, 133, 213);\n"
-"}")
+        self.pushButton_3.setStyleSheet(
+            "QPushButton{\n"
+            "    border: 2px solid rgb(69, 113, 213);\n"
+            "    border-radius: 10px;\n"
+            "    background: rgb(69, 113, 213);\n"
+            "    color: rgb(255, 255, 255)\n"
+            "}\n"
+            "QPushButton:hover{\n"
+            "    border: rgb(96, 133, 213);\n"
+            "    background: rgb(96, 133, 213);\n"
+            "}"
+        )
         self.pushButton_3.setObjectName("pushButton_3")
         self.verticalLayout_5.addWidget(self.pushButton_3)
         self.label_4 = QtWidgets.QLabel(self.frame_5)
@@ -364,32 +362,36 @@ class Ui_MainWindow(object):
         font = QtGui.QFont()
         font.setPointSize(15)
         self.pushButton.setFont(font)
-        self.pushButton.setStyleSheet("QPushButton{\n"
-"    border: 2px solid rgb(69, 113, 213);\n"
-"    border-radius: 10px;\n"
-"    background: rgb(69, 113, 213);\n"
-"    color: rgb(255, 255, 255)\n"
-"}\n"
-"QPushButton:hover{\n"
-"    border: rgb(96, 133, 213);\n"
-"    background: rgb(96, 133, 213);\n"
-"}")
+        self.pushButton.setStyleSheet(
+            "QPushButton{\n"
+            "    border: 2px solid rgb(69, 113, 213);\n"
+            "    border-radius: 10px;\n"
+            "    background: rgb(69, 113, 213);\n"
+            "    color: rgb(255, 255, 255)\n"
+            "}\n"
+            "QPushButton:hover{\n"
+            "    border: rgb(96, 133, 213);\n"
+            "    background: rgb(96, 133, 213);\n"
+            "}"
+        )
         self.pushButton.setObjectName("pushButton")
         self.pushButton_2 = QtWidgets.QPushButton(self.frame_4)
         self.pushButton_2.setGeometry(QtCore.QRect(410, 100, 171, 51))
         font = QtGui.QFont()
         font.setPointSize(15)
         self.pushButton_2.setFont(font)
-        self.pushButton_2.setStyleSheet("QPushButton{\n"
-"    border: 2px solid rgb(69, 113, 213);\n"
-"    border-radius: 10px;\n"
-"    background: rgb(69, 113, 213);\n"
-"    color: rgb(255, 255, 255)\n"
-"}\n"
-"QPushButton:hover{\n"
-"    border: rgb(96, 133, 213);\n"
-"    background: rgb(96, 133, 213);\n"
-"}")
+        self.pushButton_2.setStyleSheet(
+            "QPushButton{\n"
+            "    border: 2px solid rgb(69, 113, 213);\n"
+            "    border-radius: 10px;\n"
+            "    background: rgb(69, 113, 213);\n"
+            "    color: rgb(255, 255, 255)\n"
+            "}\n"
+            "QPushButton:hover{\n"
+            "    border: rgb(96, 133, 213);\n"
+            "    background: rgb(96, 133, 213);\n"
+            "}"
+        )
         self.pushButton_2.setObjectName("pushButton_2")
         self.verticalLayout_3.addWidget(self.frame_4)
         self.tabWidget.addTab(self.tab_2, "")
@@ -416,7 +418,9 @@ class Ui_MainWindow(object):
         self.actionExport = QtWidgets.QAction(MainWindow)
         self.actionExport.setObjectName("actionExport")
         self.actionImport_LSS_with_inverse_filter = QtWidgets.QAction(MainWindow)
-        self.actionImport_LSS_with_inverse_filter.setObjectName("actionImport_LSS_with_inverse_filter")
+        self.actionImport_LSS_with_inverse_filter.setObjectName(
+            "actionImport_LSS_with_inverse_filter"
+        )
         self.action1_wav_per_file = QtWidgets.QAction(MainWindow)
         self.action1_wav_per_file.setObjectName("action1_wav_per_file")
         self.action4_wav_per_file = QtWidgets.QAction(MainWindow)
@@ -446,7 +450,9 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "Ambisonics Impulse Response Analyzer"))
+        MainWindow.setWindowTitle(
+            _translate("MainWindow", "Ambisonics Impulse Response Analyzer")
+        )
         self.radioButton.setText(_translate("MainWindow", "Integration window"))
         self.label_5.setText(_translate("MainWindow", "Analysis length [ms]"))
         self.label_6.setText(_translate("MainWindow", "Threshold [dB]"))
@@ -454,27 +460,42 @@ class Ui_MainWindow(object):
         self.label_4.setText(_translate("MainWindow", "AIRA"))
         self.label_3.setText(_translate("MainWindow", "Hedgehog view"))
         self.label_2.setText(_translate("MainWindow", "Omnidirectional channel"))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), _translate("MainWindow", "Main"))
+        self.tabWidget.setTabText(
+            self.tabWidget.indexOf(self.tab), _translate("MainWindow", "Main")
+        )
         self.label.setText(_translate("MainWindow", "AIRA"))
         self.pushButton.setText(_translate("MainWindow", "Loaded"))
         self.pushButton_2.setText(_translate("MainWindow", "Export"))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), _translate("MainWindow", "Floorplan"))
+        self.tabWidget.setTabText(
+            self.tabWidget.indexOf(self.tab_2), _translate("MainWindow", "Floorplan")
+        )
         self.menuFile.setTitle(_translate("MainWindow", "File"))
         self.menuTool.setTitle(_translate("MainWindow", "Tools"))
         self.menuImport_A_format.setTitle(_translate("MainWindow", "Import A-format"))
         self.menuImport_B_format.setTitle(_translate("MainWindow", "Import B-format"))
         self.actionOpen.setText(_translate("MainWindow", "Open project"))
         self.actionExport.setText(_translate("MainWindow", "Export project"))
-        self.actionImport_LSS_with_inverse_filter.setText(_translate("MainWindow", "Import LSS with inverse filter"))
-        self.action1_wav_per_file.setText(_translate("MainWindow", "1-channel per file"))
-        self.action4_wav_per_file.setText(_translate("MainWindow", "4-channels per file"))
-        self.action1_channel_per_file.setText(_translate("MainWindow", "1-channel per file"))
-        self.action4_channels_per_file.setText(_translate("MainWindow", "4-channels per file"))
+        self.actionImport_LSS_with_inverse_filter.setText(
+            _translate("MainWindow", "Import LSS with inverse filter")
+        )
+        self.action1_wav_per_file.setText(
+            _translate("MainWindow", "1-channel per file")
+        )
+        self.action4_wav_per_file.setText(
+            _translate("MainWindow", "4-channels per file")
+        )
+        self.action1_channel_per_file.setText(
+            _translate("MainWindow", "1-channel per file")
+        )
+        self.action4_channels_per_file.setText(
+            _translate("MainWindow", "4-channels per file")
+        )
         self.actionSave_project.setText(_translate("MainWindow", "Save project"))
 
 
 if __name__ == "__main__":
     import sys
+
     app = QtWidgets.QApplication(sys.argv)
     MainWindow = QtWidgets.QMainWindow()
     ui = Ui_MainWindow()

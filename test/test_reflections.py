@@ -102,7 +102,7 @@ def test_get_hedgehog_array(
         elevation,
         _,
         _,
-    ) = intensity_azimuth_elevation  # pylint: disable=unpacking-nono-sequence
+    ) = intensity_azimuth_elevation  # pylint: disable=unpacking-non-sequence
     masked_intensity, masked_azimuth, masked_elevation = get_hedgehog_arrays(
         intensity, azimuth, elevation
     )
