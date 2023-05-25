@@ -1,3 +1,5 @@
+"""Functionality for filtering signals."""
+
 import numpy as np
 import scipy.signal as sc
 
@@ -87,7 +89,13 @@ class NonCoincidentMicsCorrection:
         self.sound_speed = sound_speed
         self.delay2center = self.mic2center / self.sound_speed
 
-    def _filter(self, b: np.ndarray, a: np.ndarray, array: np.ndarray) -> np.ndarray:
+    def _filter(
+        # pylint: disable=invalid-name
+        self,
+        b: np.ndarray,
+        a: np.ndarray,
+        array: np.ndarray,
+    ) -> np.ndarray:
         """Applies filter to array given numerator "b" and denominator "a" from
         analog filter frequency response
 
@@ -128,9 +136,11 @@ class NonCoincidentMicsCorrection:
             Axis array signal corrected
         """
         # Filter equations
+        # pylint: disable=invalid-name
         b = np.sqrt(6) * np.array(
             [1, 1j * (1 / 3) * self.mic2center, -(1 / 3) * self.delay2center**2]
         )
+        # pylint: disable=invalid-name
         a = np.array([1, 1j * (1 / 3) * self.delay2center])
 
         axis_corrected = self._filter(b, a, axis_array)
@@ -151,7 +161,9 @@ class NonCoincidentMicsCorrection:
             Omnidirectional array signal corrected
         """
         # Filter equations
+        # pylint: disable=invalid-name
         b = np.array([1, 1j * self.delay2center, -(1 / 3) * self.delay2center**2])
+        # pylint: disable=invalid-name
         a = np.array([1, 1j * (1 / 3) * self.delay2center])
 
         omni_corrected = self._filter(b, a, omni_array)

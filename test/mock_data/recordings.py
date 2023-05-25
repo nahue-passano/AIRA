@@ -1,23 +1,32 @@
-from random import randint
+"""Mocked signals for use in unit tests."""
 
 import numpy as np
+import pytest
 from soundfile import read
 
+from aira.formatter import convert_ambisonics_a_to_b
 
-def create_mock_bformat_signal(sample_rate: int, duration_seconds: float) -> np.ndarray:
+
+@pytest.fixture
+def bformat_signal_random(sample_rate: int, duration_seconds: float) -> np.ndarray:
+    """Return a random array of 4 rows corresponding to W, X, Y and Z channels."""
     return np.random.randint(
         -32767, 32768, size=(4, round(sample_rate * duration_seconds)), dtype=np.int16
     )
 
 
-def load_mocked_bformat():
+@pytest.fixture
+def aformat_signal_and_samplerate() -> tuple:
+    """Return a tuple with an array of FLU, FRD, BRU and BLD channels, one
+    for each of the 4 rows, in the first element of the tuple, and the sample
+    rate of the recording in the second element of the tuple."""
     ordered_aformat_channels = (
         "FLU",
         "FRD",
         "BRU",
         "BLD",
     )  # Assert the ordering is standardized across the project
-    audio_paths = dict(
+    audio_paths = dict(  # pylint: disable=use-dict-literal
         FLU="./test/mock_data/soundfield_flu.wav",
         FRD="./test/mock_data/soundfield_frd.wav",
         BRU="./test/mock_data/soundfield_bru.wav",
@@ -38,3 +47,19 @@ def load_mocked_bformat():
 
     signals_array = np.array(audio_signals)
     return signals_array, sample_rates[0]
+
+
+@pytest.fixture
+def bformat_signal_and_samplerate(
+    aformat_signal_and_samplerate: tuple,
+):  # pylint: disable=redefined-outer-name
+    """Return a tuple with an array of W, X, Y and Z channels, one
+    for each of the 4 rows, in the first element of the tuple, and the sample
+    rate of the recording in the second element of the tuple."""
+    aformat_signals, sample_rate = aformat_signal_and_samplerate
+    aformat_signals = [aformat_signals[a_channel, :] for a_channel in range(4)]
+    return (
+        # pylint: disable=no-value-for-parameter
+        convert_ambisonics_a_to_b(aformat_signals),
+        sample_rate,
+    )
