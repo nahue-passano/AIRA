@@ -51,5 +51,6 @@ def hedgehog(
         )
     ))
     
+    fig.update_layout(template="plotly_dark")
     fig.show()
     return fig
