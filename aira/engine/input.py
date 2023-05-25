@@ -53,7 +53,7 @@ class LSSInputStrategy(InputStrategy):
     LSS measurements with their inverse filter"""
 
     @staticmethod
-    def get_ir_array(signals_array: np.ndarray) -> np.ndarray:
+    def get_ir_array(signals_array: np.ndarray, sample_rate: int) -> np.ndarray:
         raise NotImplementedError("Available inputs are in A-Format and B-Format")
 
 
