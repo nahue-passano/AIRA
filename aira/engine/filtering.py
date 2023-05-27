@@ -132,21 +132,3 @@ def apply_low_pass_filter(
     )
 
     return lfilter(filter_coefficients, 1.0, signal)
-
-
-def convolve(signal_1: np.ndarray, signal_2: np.ndarray) -> np.ndarray:
-    """Applies convolution with scipy.signal.fftconvolve() function
-
-    Parameters
-    ----------
-    signal_1 : np.ndarray
-        First signal to be convolved
-    signal_2 : np.ndarray
-        Second signal to be convolved
-
-    Returns
-    -------
-    np.ndarray
-        Convolved signal
-    """
-    return sc.fftconvolve(signal_1, signal_2, mode="valid")

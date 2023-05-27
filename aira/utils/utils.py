@@ -8,6 +8,51 @@ from typing import Dict, List, Tuple, Union
 import numpy as np
 import soundfile as sf
 
+# WARNING: Está codeado como el upite pero quiero probar algunas cosas.
+# Por otro lado, creo que va a ser mejor pasar las seniales dentro de un diccionario,
+# para poder identificar cada canal ambisonics, y ademas el filtro inverso
+
+
+def read_signals_dict(signals_dict: dict) -> Tuple[np.ndarray, float]:
+    for key_i, path_i in signals_dict.items():
+        try:  # a puro huevo
+            signal_i, sample_rate = sf.read(path_i)
+            signals_dict[key_i] = signal_i.T
+        except:
+            pass
+    signals_dict["sample_rate"] = sample_rate
+
+    if signals_dict["channels_per_file"] == 1:
+        if signals_dict["input_mode"] == "bformat":
+            bformat_keys = ["w_channel", "x_channel", "y_channel", "z_channel"]
+            signals_dict["stacked_signals"] = stack_dict_arrays(
+                signals_dict, bformat_keys
+            )
+        else:
+            aformat_keys = [
+                "front_left_up",
+                "front_right_down",
+                "back_right_up",
+                "back_left_down",
+            ]
+            signals_dict["stacked_signals"] = stack_dict_arrays(
+                signals_dict, aformat_keys
+            )
+
+    return signals_dict
+
+
+def stack_dict_arrays(signals_dict_array: dict, keys: List[str]) -> np.ndarray:
+    audio_array = []
+    for key_i in keys:
+        audio_array.append(signals_dict_array[key_i])
+
+    return audio_array
+
+
+def read_audio(audio_path: str) -> Tuple[np.ndarray, float]:
+    return sf.read(audio_path)
+
 
 @singledispatch
 def read_aformat(audio_path: Union[str, Path]) -> Tuple[np.ndarray, float]:

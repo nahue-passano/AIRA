@@ -12,8 +12,8 @@ from scipy.signal import find_peaks
 class ReflectionDetectionStrategy(ABC):
     """Base interface for a reflection detection algorithm."""
 
-    @abstractmethod
     @staticmethod
+    @abstractmethod
     def get_indeces_of_reflections(intensity_magnitude: np.ndarray) -> np.ndarray:
         """Abstract method to be overwritten by concrete implementations of
         reflection detection."""
