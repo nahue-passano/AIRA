@@ -35,22 +35,16 @@ def hedgehog(
         )
     )  # Plotly requires a dataframe input
     plot_df.intensity = plot_df.intensity.astype(float)
-    fig = go.Figure(data=go.Scatter3d(
-        x=x,
-        y=y,
-        z=z,
-        marker=dict(
-            size=8,
-            color=reflections_intensity,
-            colorscale='portland'
-            ),
-        line=dict(
-            color=reflections_intensity,
-            colorscale='portland',
-            width=6
+    fig = go.Figure(
+        data=go.Scatter3d(
+            x=x,
+            y=y,
+            z=z,
+            marker=dict(size=8, color=reflections_intensity, colorscale="portland"),
+            line=dict(color=reflections_intensity, colorscale="portland", width=6),
         )
-    ))
-    
+    )
+
     fig.update_layout(template="plotly_dark")
     fig.show()
     return fig

@@ -12,12 +12,6 @@ repos:
     types: [python]
     pass_filenames: true
     entry: poetry run black
-  - id: isort
-    name: Imports sorting (isort)
-    language: system
-    types: [python]
-    pass_filenames: true
-    entry: poetry run isort
   - id: pylint
     name: Code linting (pylint)
     language: system
