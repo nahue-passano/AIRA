@@ -3,6 +3,7 @@
 import numpy as np
 import pandas as pd
 import plotly.express as px
+import plotly.graph_objects as go
 
 from aira.utils.formatter import convert_polar_to_cartesian
 
@@ -34,13 +35,16 @@ def hedgehog(
         )
     )  # Plotly requires a dataframe input
     plot_df.intensity = plot_df.intensity.astype(float)
-    fig = px.line_3d(
-        plot_df,
-        x="x",
-        y="y",
-        z="z",
-        color="intensity",
-        color_discrete_sequence=px.colors.sequential.Bluered,
+    fig = go.Figure(
+        data=go.Scatter3d(
+            x=x,
+            y=y,
+            z=z,
+            marker=dict(size=8, color=reflections_intensity, colorscale="portland"),
+            line=dict(color=reflections_intensity, colorscale="portland", width=6),
+        )
     )
+
+    fig.update_layout(template="plotly_dark")
     fig.show()
     return fig
