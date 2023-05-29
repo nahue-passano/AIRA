@@ -26,10 +26,10 @@ def test_read_aformat_from_list(
     expected_shape = expected_signal.shape
 
     audio_path_list = [
-        "./test/mock_data/soundfield_flu.wav",
-        "./test/mock_data/soundfield_frd.wav",
-        "./test/mock_data/soundfield_bru.wav",
-        "./test/mock_data/soundfield_bld.wav",
+        "./test/mock_data/regio_theater/soundfield_flu.wav",
+        "./test/mock_data/regio_theater/soundfield_frd.wav",
+        "./test/mock_data/regio_theater/soundfield_bru.wav",
+        "./test/mock_data/regio_theater/soundfield_bld.wav",
     ]
     audio_array, sample_rate = read_aformat(  # pylint: disable=unpacking-non-sequence
         audio_path_list
