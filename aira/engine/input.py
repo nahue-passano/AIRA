@@ -1,69 +1,149 @@
+"""Input preprocessing module."""
 from abc import ABC, abstractmethod
 from enum import Enum
-from typing import Tuple, Union
 
 import numpy as np
-from matplotlib import pyplot as plt
 from scipy.signal import fftconvolve
 
 from aira.engine.filtering import NonCoincidentMicsCorrection
 from aira.utils import convert_ambisonics_a_to_b
 
 
+# pylint: disable=too-few-public-methods
+class InputMode(Enum):
+    """Enum class for accessing the existing `InputMode`s"""
+
+    LSS = "lss"
+    AFORMAT = "aformat"
+    BFORMAT = "bformat"
+
+
+# pylint: disable=too-few-public-methods
 class InputProcessor(ABC):
+    """Base interface for inputs processors"""
+
     @abstractmethod
-    def process(self, signals_array: np.ndarray) -> np.ndarray:
-        pass
+    def process(self, input_dict: dict) -> dict:
+        """Abstract method to be overwritten by concrete implementations of
+        input processing."""
 
 
+# pylint: disable=too-few-public-methods
 class LSSInputProcessor(InputProcessor):
-    def __init__(self, inverse_filter: np.ndarray):
-        self.inverse_filter = inverse_filter
+    """Processing when input data is in LSS mode"""
 
-    def process(self, signals_array: np.ndarray) -> np.ndarray:
-        a_format_signals = np.apply_along_axis(
-            lambda array: fftconvolve(array, self.inverse_filter, mode="full"),
+    def process(self, input_dict: dict) -> dict:
+        """Gets impulse response arrays from Long Sine Sweep (LSS) measurements. The new
+        signals are in A-Format.
+
+        Parameters
+        ----------
+        input_dict : dict
+            Dictionary with LSS measurement arrays
+
+        Returns
+        -------
+        dict
+            input_dict overwritten with A-Format signals
+        """
+        if input_dict["input_mode"] != InputMode.LSS:
+            return input_dict
+
+        input_dict["stacked_signals"] = np.apply_along_axis(
+            lambda array: fftconvolve(array, input_dict["inverse_filter"], mode="full"),
             axis=1,
-            arr=signals_array,
+            arr=input_dict["stacked_signals"],
         )
-        return a_format_signals
+        input_dict["input_mode"] = InputMode.AFORMAT
+
+        return input_dict
 
 
+# pylint: disable=too-few-public-methods
 class AFormatProcessor(InputProcessor):
-    def process(self, signals_array: np.ndarray) -> np.ndarray:
-        b_format_signals = convert_ambisonics_a_to_b(
-            signals_array[0, :],
-            signals_array[1, :],
-            signals_array[2, :],
-            signals_array[3, :],
+    """Processing when input data is in mode AFORMAT"""
+
+    def process(self, input_dict: dict) -> dict:
+        """Gets B-format arrays from A-format arrays. For more details see
+        aira.utils.formatter.convert_ambisonics_a_to_b function.
+
+        Parameters
+        ----------
+        input_dict : dict
+            Dictionary with A-format arrays
+
+        Returns
+        -------
+        dict
+            input_dict overwritten with B-format signals
+        """
+        if input_dict["input_mode"] != InputMode.AFORMAT:
+            return input_dict
+        input_dict["stacked_signals"] = convert_ambisonics_a_to_b(
+            input_dict["stacked_signals"][0, :],
+            input_dict["stacked_signals"][1, :],
+            input_dict["stacked_signals"][2, :],
+            input_dict["stacked_signals"][3, :],
         )
-        return b_format_signals
+        input_dict["input_mode"] = InputMode.BFORMAT
+        return input_dict
 
 
+# pylint: disable=too-few-public-methods
 class BFormatProcessor(InputProcessor):
-    def __init__(self, sample_rate: int):
-        self.sample_rate = sample_rate
+    """Processin when input data is in BFORMAT mode."""
 
-    def process(self, signals_array: np.ndarray) -> np.ndarray:
-        frequency_corrector = NonCoincidentMicsCorrection(self.sample_rate)
-        b_format_corrected = np.zeros_like(signals_array)
-        b_format_corrected[0, :] = frequency_corrector.correct_omni(signals_array[0, :])
-        b_format_corrected[1:, :] = frequency_corrector.correct_axis(
-            signals_array[1:, :]
+    def process(self, input_dict: dict) -> dict:
+        """Corrects B-format arrays frequency response for non-coincident microphones.
+
+        Parameters
+        ----------
+        input_dict : dict
+            Dictionary with B-format arrays.
+
+        Returns
+        -------
+        dict
+            input_dict overwritten with B-format frequency corrected arrays.
+        """
+        if input_dict["input_mode"] != InputMode.BFORMAT and not bool(
+            input_dict["frequency_correction"]
+        ):
+            return input_dict
+
+        frequency_corrector = NonCoincidentMicsCorrection(input_dict["sample_rate"])
+
+        input_dict["stacked_signals"][0, :] = frequency_corrector.correct_omni(
+            input_dict["stacked_signals"][0, :]
         )
+        input_dict["stacked_signals"][1:, :] = frequency_corrector.correct_axis(
+            input_dict["stacked_signals"][1:, :]
+        )
+        input_dict["input_mode"] = InputMode.BFORMAT
+        return input_dict
 
-        return b_format_corrected
 
+# pylint: disable=too-few-public-methods
+class InputProcessorChain:
+    """Chain of input processors"""
 
-class InputProcessorBuilder:
     def __init__(self):
-        self.processors = []
+        self.processors = [LSSInputProcessor(), AFormatProcessor(), BFormatProcessor()]
 
-    def with_processor(self, processor: list):
-        self.processors.extend(processor)
+    def process(self, input_dict: dict) -> np.ndarray:
+        """Applies the chain of processors for the input_mode setted.
 
-    def process(self, signals_array: np.ndarray) -> np.ndarray:
+        Parameters
+        ----------
+        input_dict : dict
+            Contains arrays and input mode data
+
+        Returns
+        -------
+        np.ndarray
+            Arrays processed stacked in single numpy.ndarray object
+        """
         for process_i in self.processors:
-            signals_array = process_i.process(signals_array)
+            input_dict = process_i.process(input_dict)
 
-        return signals_array
+        return input_dict["stacked_signals"]

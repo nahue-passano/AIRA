@@ -53,7 +53,7 @@ class NeighborReflectionDetectionStrategy(ReflectionDetectionStrategy):
             np.ndarray: an array with the indeces of the peaks.
         """
         # Drop peak properties ([0]) and direct sound peak ([1])
-        return find_peaks(intensity_magnitude)[0][1:]
+        return find_peaks(intensity_magnitude)[0]
 
 
 class ReflectionDetectionStrategies(Enum):

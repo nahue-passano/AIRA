@@ -2,7 +2,6 @@
 
 import numpy as np
 import pandas as pd
-import plotly.express as px
 import plotly.graph_objects as go
 
 from aira.utils.formatter import convert_polar_to_cartesian
@@ -24,15 +23,15 @@ def hedgehog(
         reflections_intensity, reflections_azimuth, reflections_elevation
     )
     plot_df = pd.DataFrame(
-        dict(
-            time=time_axis,
-            intensity=reflections_intensity,
-            azimuth=reflections_azimuth,
-            elevation=reflections_elevation,
-            x=x,
-            y=y,
-            z=z,
-        )
+        {
+            "time": time_axis,
+            "intensity": reflections_intensity,
+            "azimuth": reflections_azimuth,
+            "elevation": reflections_elevation,
+            "x": x,
+            "y": y,
+            "z": z,
+        }
     )  # Plotly requires a dataframe input
     plot_df.intensity = plot_df.intensity.astype(float)
     fig = go.Figure(
@@ -40,8 +39,12 @@ def hedgehog(
             x=x,
             y=y,
             z=z,
-            marker=dict(size=8, color=reflections_intensity, colorscale="portland"),
-            line=dict(color=reflections_intensity, colorscale="portland", width=6),
+            marker={
+                "size": 8,
+                "color": reflections_intensity,
+                "colorscale": "portland",
+            },
+            line={"color": reflections_intensity, "colorscale": "portland", "width": 6},
         )
     )
 

@@ -1,7 +1,6 @@
 """Functionality for filtering signals."""
 
 import numpy as np
-import scipy.signal as sc
 from scipy.signal import bilinear, firwin, kaiserord, lfilter
 
 MIC2CENTER = 3

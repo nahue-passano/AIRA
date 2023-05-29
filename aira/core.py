@@ -1,79 +1,103 @@
+"""Core processing for AIRA module."""
 import logging
-from typing import List, Union
+import time
+from dataclasses import dataclass
 
-import numpy as np
 
-from aira.engine.input import (
-    AFormatProcessor,
-    BFormatProcessor,
-    InputProcessorBuilder,
-    LSSInputProcessor,
-)
+from aira.engine.input import InputProcessorChain, InputMode
 from aira.engine.intensity import convert_bformat_to_intensity
 from aira.engine.plot import hedgehog
 from aira.engine.reflections import get_hedgehog_arrays
 from aira.utils import read_signals_dict
 
+
 logging.basicConfig(
-    filename="aira.log", filemode="w", format="%(name)s - %(levelname)s - %(message)s"
+    filename="aira.log",
+    filemode="w",
+    format="%(name)s - %(levelname)s - %(message)s",
+    level=logging.INFO,
 )
 
-INTEGRATION_TIME = 0.01
+INTEGRATION_TIME = 0.001
 INTENSITY_THRESHOLD = 60
 
 
+@dataclass
 class AmbisonicsImpulseResponseAnalyzer:
-    def __init__(
-        self,
-        integration_time: float,
-        intensity_threshold: float,
-        bformat_frequency_correction: bool = True,
-    ):
-        self.integration_time = integration_time
-        self.intensity_threshold = intensity_threshold
-        self.bformat_frequency_correction = bformat_frequency_correction
+    """Main class for analyzing Ambisonics impulse responses"""
+
+    integration_time: float = INTEGRATION_TIME
+    intensity_threshold: float = INTENSITY_THRESHOLD
+    bformat_frequency_correction: bool = True
+    input_builder = InputProcessorChain()
+
+    def _log_settings(self) -> None:
+        logging.info("Settings:")
+        logging.info(f">> Integration time: {self.integration_time}")
+        logging.info(f">> Intensity theshold: {self.intensity_threshold}")
+
+    @staticmethod
+    def _timer(time_reference: float) -> float:
+        """Counters the running time given a time reference
+
+        Parameters
+        ----------
+        time_reference : float
+            Time reference to be based
+
+        Returns
+        -------
+        float
+            Time difference with time_reference
+        """
+        return round(time.time() - time_reference, 3)
 
     def analyze(self, input_dict: dict):
-        # Esto capaz se puede modularizar en otra función/método dentro de input.py
-        # Mas que nada para no importar todos los xxxInputProcessor, ya que se basa todo
-        # en el dict de entrada
-        # TODO: Implementar un logger
-        logging.info("[INFO] Analyzing input files:\n")
+        """Analyzes a set of measurements in Ambisonics format and plots a hedgehog
+        with the estimated reflections direction.
+
+        Parameters
+        ----------
+        input_dict : dict
+            Dictionary with all the data needed to analyze a set of measurements
+            (paths of the measurements, input mode, channels per file, etc.)
+        """
+        self._log_settings()
+        logging.info("Analyzing input files:")
         for key, value in input_dict.items():
             logging.info(f">> {key}: {value}")
 
+        read_signals_time = time.time()
         signals_dict = read_signals_dict(input_dict)
+        logging.info("Run info")
+        logging.info(f">> Signals loaded - Done in {self._timer(read_signals_time)} s")
 
-        logging.info("[INFO] Signals loaded successfully")
+        bformat_preprocessing_time = time.time()
+        bformat_signals = self.input_builder.process(input_dict)
 
-        input_builder = InputProcessorBuilder()
+        logging.info(
+            f">> Input preprocessed - Done in {self._timer(bformat_preprocessing_time)} s"
+        )
 
-        if signals_dict["input_mode"] == "lss":
-            logging.info("[INFO] Applying LSS processing to get A-Format Signals")
-            input_builder.with_processor(
-                [LSSInputProcessor(inverse_filter=signals_dict["inverse_filter"])]
-            )
-
-        if signals_dict["input_mode"] != "bformat":
-            logging.info("[INFO] Applying A-Format processing to get B-Format Signals")
-            input_builder.with_processor([AFormatProcessor()])
-
-        if self.bformat_frequency_correction:
-            logging.info("[INFO] Applying frequency correction for non-coincident mics")
-            input_builder.with_processor(
-                [BFormatProcessor(sample_rate=signals_dict["sample_rate"])]
-            )
-
-        bformat_signals = input_builder.process(signals_dict["stacked_signals"])
-
+        bformat_to_intensity_time = time.time()
         intensity, azimuth, elevation = convert_bformat_to_intensity(
             bformat_signals, signals_dict["sample_rate"], self.integration_time
         )
 
+        logging.info(
+            f">> Intensity arrays generated - Done in {self._timer(bformat_to_intensity_time)} s"
+        )
+
+        hedgehog_arrays_time = time.time()
         masked_intensity, masked_azimuth, masked_elevation = get_hedgehog_arrays(
             intensity, azimuth, elevation
         )
 
+        logging.info(
+            f">> Hedgehog arrays generated - Done in {self._timer(hedgehog_arrays_time)} s"
+        )
+
+        plot_time = time.time()
         fig = hedgehog(
             masked_intensity,
             masked_azimuth,
@@ -82,40 +106,32 @@ class AmbisonicsImpulseResponseAnalyzer:
             bformat_signals.shape[1] / signals_dict["sample_rate"],
         )
 
+        logging.info(f">> Ploted successfully - Done in {self._timer(plot_time)} s")
+        logging.info(f"Run time: {self._timer(read_signals_time)} s")
+
+        return fig
+
 
 if __name__ == "__main__":
-    input_dict = {
-        "front_left_up": "test/mock_data/soundfield_flu.wav",
-        "front_right_down": "test/mock_data/soundfield_frd.wav",
-        "back_right_up": "test/mock_data/soundfield_bru.wav",
-        "back_left_down": "test/mock_data/soundfield_bld.wav",
-        "inverse_filter": "test/mock_data/soundfield_inverse_filter.wav",
-        "input_mode": "lss",
+    # Regio theater
+    data = {
+        "front_left_up": "test/mock_data/regio_theater/soundfield_flu.wav",
+        "front_right_down": "test/mock_data/regio_theater/soundfield_frd.wav",
+        "back_right_up": "test/mock_data/regio_theater/soundfield_bru.wav",
+        "back_left_down": "test/mock_data/regio_theater/soundfield_bld.wav",
+        "inverse_filter": "test/mock_data/regio_theater/soundfield_inverse_filter.wav",
+        "input_mode": InputMode.LSS,
         "channels_per_file": 1,
+        "frequency_correction": True,
     }
 
-    analyzer = AmbisonicsImpulseResponseAnalyzer(INTEGRATION_TIME, INTENSITY_THRESHOLD)
-    analyzer.analyze(input_dict)
+    # York auditorium
+    # data = {
+    #     "stacked_signals": "test/mock_data/york_auditorium/s1r2.wav",
+    #     "input_mode": InputMode.BFORMAT,
+    #     "channels_per_file": 4,
+    #     "frequency_correction": True,
+    # }
 
-
-"""
-input_dict en casos: aformat, lss
-input_dict = {
-    "front_left_up": <path>,
-    "front_right_down": <path>,
-    "back_right_up": <path>,
-    "back_left_down": <path>,
-    "input_mode": "aformat", # options: ["aformat", "bformat" ,"lss"]
-    "channels_per_file": 1 # options: [1, 4]
-}
-
-input_dict en caso: bformat
-input_dict = {
-    "w_channel": <path>,
-    "x_channel": <path>,
-    "y_channel": <path>,
-    "z_channel": <path>,
-    "input_mode": "bformat",
-    "channels_per_file": 4  # options: [1, 4]
-}
-"""
+    analyzer = AmbisonicsImpulseResponseAnalyzer()
+    analyzer.analyze(data)
