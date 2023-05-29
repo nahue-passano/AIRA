@@ -9,9 +9,9 @@ from mock_data.recordings import (  # pylint: disable=unused-import
     bformat_signal_and_samplerate,
 )
 
-from aira.intensity import convert_bformat_to_intensity
-from aira.plot import hedgehog
-from aira.reflections import get_hedgehog_arrays
+from aira.engine.intensity import convert_bformat_to_intensity
+from aira.engine.plot import hedgehog
+from aira.engine.reflections import get_hedgehog_arrays
 
 
 def test_plot_hedgehog(

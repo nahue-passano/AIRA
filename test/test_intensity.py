@@ -7,7 +7,7 @@ from mock_data.recordings import (  # pylint: disable=unused-import
     bformat_signal_and_samplerate,
 )
 
-from aira.intensity import convert_bformat_to_intensity
+from aira.engine.intensity import convert_bformat_to_intensity
 
 
 def test_conversion_to_intensity(

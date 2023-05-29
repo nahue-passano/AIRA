@@ -62,10 +62,10 @@ def test_read_aformat_from_dict(
     expected_shape = expected_signal.shape
 
     audio_paths = dict(  # pylint: disable=use-dict-literal
-        front_left_up="./test/mock_data/soundfield_flu.wav",
-        front_right_down="./test/mock_data/soundfield_frd.wav",
-        back_right_up="./test/mock_data/soundfield_bru.wav",
-        back_left_down="./test/mock_data/soundfield_bld.wav",
+        front_left_up="./test/mock_data/regio_theater/soundfield_flu.wav",
+        front_right_down="./test/mock_data/regio_theater/soundfield_frd.wav",
+        back_right_up="./test/mock_data/regio_theater/soundfield_bru.wav",
+        back_left_down="./test/mock_data/regio_theater/soundfield_bld.wav",
     )
     audio_array, sample_rate = read_aformat(  # pylint: disable=unpacking-non-sequence
         audio_paths
