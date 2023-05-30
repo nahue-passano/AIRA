@@ -4,7 +4,7 @@ import numpy as np
 import pytest
 from soundfile import read
 
-from aira.formatter import convert_ambisonics_a_to_b
+from aira.utils import convert_ambisonics_a_to_b
 
 
 @pytest.fixture
@@ -27,10 +27,10 @@ def aformat_signal_and_samplerate() -> tuple:
         "BLD",
     )  # Assert the ordering is standardized across the project
     audio_paths = dict(  # pylint: disable=use-dict-literal
-        FLU="./test/mock_data/soundfield_flu.wav",
-        FRD="./test/mock_data/soundfield_frd.wav",
-        BRU="./test/mock_data/soundfield_bru.wav",
-        BLD="./test/mock_data/soundfield_bld.wav",
+        FLU="./test/mock_data/regio_theater/soundfield_flu.wav",
+        FRD="./test/mock_data/regio_theater/soundfield_frd.wav",
+        BRU="./test/mock_data/regio_theater/soundfield_bru.wav",
+        BLD="./test/mock_data/regio_theater/soundfield_bld.wav",
     )
     audio_data = {
         cardioid_channel: dict(zip(("signal", "sample_rate"), read(path)))

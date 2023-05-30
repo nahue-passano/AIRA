@@ -12,8 +12,8 @@ from scipy.signal import find_peaks
 class ReflectionDetectionStrategy(ABC):
     """Base interface for a reflection detection algorithm."""
 
-    @abstractmethod
     @staticmethod
+    @abstractmethod
     def get_indeces_of_reflections(intensity_magnitude: np.ndarray) -> np.ndarray:
         """Abstract method to be overwritten by concrete implementations of
         reflection detection."""
@@ -53,7 +53,7 @@ class NeighborReflectionDetectionStrategy(ReflectionDetectionStrategy):
             np.ndarray: an array with the indeces of the peaks.
         """
         # Drop peak properties ([0]) and direct sound peak ([1])
-        return find_peaks(intensity_magnitude)[0][1:]
+        return find_peaks(intensity_magnitude)[0]
 
 
 class ReflectionDetectionStrategies(Enum):

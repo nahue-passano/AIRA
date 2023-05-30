@@ -3,11 +3,10 @@
 from typing import Tuple
 
 import numpy as np
-from scipy.signal import firwin, kaiserord, lfilter
+
+from aira.engine.filtering import apply_low_pass_filter
 
 FILTER_CUTOFF = 5000
-FILTER_TRANSITION_WIDTH_HZ = 250.0
-FILTER_RIPPLE_DB = 60.0
 
 
 def integrate_intensity_directions(
@@ -51,37 +50,9 @@ def integrate_intensity_directions(
     window = np.hamming(duration_samples)
     for i in range(0, output_shape[1]):
         intensity_segment = intensity_directions[:, i : i + duration_samples]
-        intensity_windowed[:, i] = np.mean(intensity_segment * window, axis=1)
+        intensity_windowed[:, i] = np.max(intensity_segment * window, axis=1)
 
     return intensity_windowed
-
-
-def apply_low_pass_filter(
-    signal: np.ndarray, cutoff_frequency: int, sample_rate: int
-) -> np.ndarray:
-    """Filter a signal at the given cutoff with an optimized number of taps
-    (order of the filter).
-
-    Args:
-        signal (np.ndarray): signal to filter.
-        cutoff_frequency (int): cutoff frequency.
-        sample_rate (int): sample rate of the signal.
-
-    Returns:
-        np.ndarray: filtered signal.
-    """
-    nyquist_rate = sample_rate / 2.0
-
-    # Compute FIR filter parameters and apply to signal.
-    transition_width_normalized = FILTER_TRANSITION_WIDTH_HZ / nyquist_rate
-    filter_length, filter_beta = kaiserord(
-        FILTER_RIPPLE_DB, transition_width_normalized
-    )
-    filter_coefficients = firwin(
-        filter_length, cutoff_frequency / nyquist_rate, window=("kaiser", filter_beta)
-    )
-
-    return lfilter(filter_coefficients, 1.0, signal)
 
 
 def convert_bformat_to_intensity(
