@@ -1,5 +1,5 @@
-# AIRA
-Ambisonics Impulse Response Analyzer
+<img src="docs/images/aira-banner.png" alt="AIRA banner" style="display: block; margin: 0 auto; width:600px"/>
+
   
 ---
 ## 🌱 **Getting started**
