@@ -31,23 +31,23 @@ class AmbisonicsImpulseResponseAnalyzer:
             Dictionary with all the data needed to analyze a set of measurements
             (paths of the measurements, input mode, channels per file, etc.)
         """
-        print("Analyzing input files:")
-        for key, value in input_dict.items():
-            print(f">> {key}: {value}")
+        # print("Analyzing input files:")
+        # for key, value in input_dict.items():
+        # print(f">> {key}: {value}")
 
         signals_dict = read_signals_dict(input_dict)
-        print("Run info")
-        print(">> Signals loaded")
+        # print("Run info")
+        # print(">> Signals loaded")
 
         bformat_signals = self.input_builder.process(input_dict)
 
-        print(">> Input preprocessed")
+        # print(">> Input preprocessed")
 
         intensity, azimuth, elevation = convert_bformat_to_intensity(
             bformat_signals, signals_dict["sample_rate"], self.integration_time
         )
 
-        print(">> Intensity arrays generated")
+        # print(">> Intensity arrays generated")
 
         (
             masked_intensity,
@@ -56,7 +56,7 @@ class AmbisonicsImpulseResponseAnalyzer:
             reflections_indeces,
         ) = get_hedgehog_arrays(intensity, azimuth, elevation)
 
-        print(">> Hedgehog arrays generated")
+        # print(">> Hedgehog arrays generated")
 
         fig = hedgehog(
             reflections_indeces,
@@ -67,7 +67,7 @@ class AmbisonicsImpulseResponseAnalyzer:
             bformat_signals.shape[1] / signals_dict["sample_rate"],
         )
 
-        print(f">> Ploted successfully")
+        # print(f">> Ploted successfully")
 
         return fig
 

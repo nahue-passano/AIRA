@@ -5,6 +5,7 @@ import pandas as pd
 import plotly.graph_objects as go
 
 from aira.utils.formatter import convert_polar_to_cartesian
+from aira.engine.intensity import min_max_normalization, intensity_to_dB
 
 
 def hedgehog(
@@ -21,12 +22,14 @@ def hedgehog(
     reflections_time = time_axis[reflections_time] * 1000
     reflections_time -= reflections_time[0]
     # pylint: disable=invalid-name
+    normalized_intensities = min_max_normalization(reflections_intensity)
     x, y, z = convert_polar_to_cartesian(
-        reflections_intensity, reflections_azimuth, reflections_elevation
+        normalized_intensities, reflections_azimuth, reflections_elevation
     )
-    reflection_to_direct = 20 * np.log10(reflections_intensity) - 20 * np.log10(
+    reflection_to_direct = intensity_to_dB(reflections_intensity) - intensity_to_dB(
         reflections_intensity.max()
     )
+
     zero_inserter = lambda i: np.insert(i, np.arange(len(i)), values=0)
     fig = go.Figure(
         data=go.Scatter3d(
@@ -34,12 +37,12 @@ def hedgehog(
             y=zero_inserter(y),
             z=zero_inserter(z),
             marker={
-                "color": zero_inserter(reflections_intensity),
+                "color": zero_inserter(normalized_intensities),
                 "colorscale": "portland",
             },
             line={
                 "width": 6,
-                "color": zero_inserter(reflections_intensity),
+                "color": zero_inserter(normalized_intensities),
                 "colorscale": "portland",
             },
             customdata=np.stack(

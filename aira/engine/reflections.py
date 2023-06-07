@@ -6,6 +6,7 @@ from typing import Tuple, Union
 
 import numpy as np
 from scipy.signal import find_peaks
+from matplotlib import pyplot as plt
 
 
 # pylint: disable=too-few-public-methods
@@ -87,10 +88,16 @@ def get_hedgehog_arrays(
     """
     if isinstance(detection_strategy, ReflectionDetectionStrategies):
         detection_strategy = detection_strategy.value
+    plt.plot(intensity)
+
     reflections_indeces = detection_strategy.get_indeces_of_reflections(intensity)
+    max_intensity_peak = intensity[reflections_indeces].argmax()
+    reflections_indeces_from_peak = reflections_indeces[max_intensity_peak:]
+    plt.stem(reflections_indeces, intensity[reflections_indeces])
+    plt.show()
     return (
-        intensity[reflections_indeces],
-        azimuth[reflections_indeces],
-        elevation[reflections_indeces],
-        reflections_indeces,
+        intensity[reflections_indeces_from_peak],
+        azimuth[reflections_indeces_from_peak],
+        elevation[reflections_indeces_from_peak],
+        reflections_indeces_from_peak,
     )
