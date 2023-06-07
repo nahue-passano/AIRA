@@ -51,6 +51,7 @@ def hedgehog(
             ),
             hovertemplate="<b>Reflection-to-direct [dB]:</b> %{customdata[0]:.2f} dB <br>"
             + "<b>Time [ms]: </b>%{customdata[1]:.2f} ms <extra></extra>",
+            auto_open=False,
         )
     )
 
