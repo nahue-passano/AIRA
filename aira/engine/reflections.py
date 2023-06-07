@@ -88,6 +88,9 @@ def get_hedgehog_arrays(
     if isinstance(detection_strategy, ReflectionDetectionStrategies):
         detection_strategy = detection_strategy.value
     reflections_indeces = detection_strategy.get_indeces_of_reflections(intensity)
-    mask = np.zeros_like(intensity)
-    mask[reflections_indeces] = 1
-    return mask * intensity, mask * azimuth, mask * elevation
+    return (
+        intensity[reflections_indeces],
+        azimuth[reflections_indeces],
+        elevation[reflections_indeces],
+        reflections_indeces,
+    )
