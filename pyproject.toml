@@ -8,11 +8,18 @@ authors = [
 ]
 
 [tool.poetry.dependencies]
-python = ">=3.8,<3.9"
+python = ">=3.8,<3.11"
 numpy = "^1.24.3"
 librosa = "^0.10.0"
 scipy = "^1.10.1"
 soundfile = "^0.12.1"
+plotly = "^5.14.1"
+pandas = "^2.0.1"
+kaleido = "0.2.1"
+matplotlib = "^3.7.1"
+pyqt5 = "^5.15.9"
+pyqtwebengine = "^5.15.6"
+
 
 [tool.poetry.dev-dependencies]
 black = "^23.3.0"

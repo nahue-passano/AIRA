@@ -1,5 +1,6 @@
 poetry.lock
 .vscode/
+outputs/
 *.pyc
 *.aux
 *.log
@@ -16,7 +17,6 @@ __pycache__/
 *.bbl
 *.bcf
 *.toc
-*.wav
 *.sh
 *.venv
 
