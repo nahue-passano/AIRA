@@ -15,12 +15,12 @@ from PyQt5.QtWidgets import (
     QLabel,
     QPushButton,
     QVBoxLayout,
-    QWidget,
     QFileDialog,
 )
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtCore import Qt
 import os
+from pathlib import Path
 
 from aira.core import AmbisonicsImpulseResponseAnalyzer
 from aira.engine.input import InputMode
@@ -46,6 +46,7 @@ class Ui_MainWindow(object):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(1350, 727)
         MainWindow.setMinimumSize(QtCore.QSize(1000, 800))
+        MainWindow.setWindowIcon(QtGui.QIcon(str(Path("docs/images/aira-icon.png"))))
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setStyleSheet("background-color:#313438 ; ")
         self.centralwidget.setObjectName("centralwidget")
@@ -87,7 +88,7 @@ class Ui_MainWindow(object):
         self.frame_logo_main.setFrameShadow(QtWidgets.QFrame.Raised)
         self.frame_logo_main.setObjectName("frame_logo_main")
         self.label_logo_main = QtWidgets.QLabel(self.frame_logo_main)
-        self.label_logo_main.setGeometry(QtCore.QRect(10, 30, 141, 41))
+        self.label_logo_main.setGeometry(QtCore.QRect(20, 30, 177, 50))
         self.label_logo_main.setMaximumSize(QtCore.QSize(500, 500))
         palette = QtGui.QPalette()
         brush = QtGui.QBrush(QtGui.QColor(69, 113, 213))
@@ -132,7 +133,7 @@ class Ui_MainWindow(object):
         font.setPointSize(24)
         self.label_logo_main.setFont(font)
         self.label_logo_main.setText("")
-        # self.label_logo_main.setPixmap(QtGui.QPixmap("C:\\Users\\Admin\\Desktop\\Facultad\\IMA\\TP RIRs 3D\\AIRA\\AIRA-logo.png"))
+        self.label_logo_main.setPixmap(QtGui.QPixmap(str(Path("docs/images/aira-logo.png"))))
         self.label_logo_main.setScaledContents(True)
         self.label_logo_main.setAlignment(QtCore.Qt.AlignCenter)
         self.label_logo_main.setObjectName("label_logo_main")
@@ -150,7 +151,7 @@ class Ui_MainWindow(object):
         self.verticalLayout_6 = QtWidgets.QVBoxLayout(self.frame_analyze)
         self.verticalLayout_6.setObjectName("verticalLayout_6")
         spacerItem2 = QtWidgets.QSpacerItem(
-            40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum
+            20, 10, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum
         )
         self.verticalLayout_6.addItem(spacerItem2)
         self.label_integration_window = QtWidgets.QLabel(self.frame_analyze)
@@ -512,7 +513,7 @@ class Ui_MainWindow(object):
         self.verticalLayout_6.addItem(spacerItem5)
         self.verticalLayout_5.addWidget(self.frame_analyze)
         self.pb_analyze = QtWidgets.QPushButton(self.frame_settings)
-        self.pb_analyze.setMinimumSize(QtCore.QSize(171, 40))
+        self.pb_analyze.setMinimumSize(QtCore.QSize(100, 40))
         font = QtGui.QFont()
         font.setFamily("Lato")
         font.setPointSize(14)
@@ -636,7 +637,7 @@ class Ui_MainWindow(object):
         self.frame_hedgehog_plot.setFrameShadow(QtWidgets.QFrame.Raised)
         self.frame_hedgehog_plot.setObjectName("frame_hedgehog_plot")
         self.gV_hedgehog = QtWebEngineWidgets.QWebEngineView(self.frame_hedgehog_plot)
-        self.gV_hedgehog.setGeometry(QtCore.QRect(0, 0, 1558, 834))
+        self.gV_hedgehog.setGeometry(QtCore.QRect(0, 0, 1558, 900))
         self.gV_hedgehog.setStyleSheet("background-color: #313438")
         self.gV_hedgehog.setObjectName("gV_hedgehog")
         self.verticalLayout_8.addWidget(self.frame_hedgehog_plot)
@@ -666,7 +667,7 @@ class Ui_MainWindow(object):
         self.label_logo_plan = QtWidgets.QLabel(self.frame_logo_plan)
         self.label_logo_plan.setGeometry(QtCore.QRect(30, 20, 141, 41))
         self.label_logo_plan.setText("")
-        # self.label_logo_plan.setPixmap(QtGui.QPixmap("C:\\Users\\Admin\\Desktop\\Facultad\\IMA\\TP RIRs 3D\\AIRA\\AIRA-logo.png"))
+        self.label_logo_plan.setPixmap(QtGui.QPixmap(str(Path("docs/images/aira-logo.png"))))
         self.label_logo_plan.setScaledContents(True)
         self.label_logo_plan.setObjectName("label_logo_plan")
         self.verticalLayout_10.addWidget(self.frame_plan_header)
@@ -882,9 +883,11 @@ class Ui_MainWindow(object):
     # Acá empiezan los métodos para las acciones del usuario
 
     def analyze(self):
+
         fig = analyzer.analyze(input_dict=data)
 
         self.gV_hedgehog.setHtml(fig.to_html(include_plotlyjs="cdn"))
+        
 
     def load_plan(self):
         file_dialog = QFileDialog()
