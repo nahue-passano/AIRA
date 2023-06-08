@@ -56,27 +56,27 @@ def hedgehog(
     camera = {
         "up": {"x": 0, "y": 0, "z": 1},
         "center": {"x": 0, "y": 0, "z": 0},
-        "eye": {"x": 1, "y": 1, "z": 1},
+        "eye": {"x": 1, "y": 1, "z": 0.7},
     }
 
     button0 = dict(
         method="relayout",
-        args=[{"scene.camera.eye": {"x": 1, "y": 1, "z": 1}}],
+        args=[{"scene.camera.eye": {"x": 1, "y": 1, "z": 0.7}}],
         label="3D perspective",
     )
     button1 = dict(
         method="relayout",
-        args=[{"scene.camera.eye": {"x": 0.0, "y": 0.0, "z": 2}}],
+        args=[{"scene.camera.eye": {"x": 0.0, "y": 0.0, "z": 1.5}}],
         label="X-Y plane",
     )
     button2 = dict(
         method="relayout",
-        args=[{"scene.camera.eye": {"x": 0.0, "y": 2, "z": 0.0}}],
+        args=[{"scene.camera.eye": {"x": 0.0, "y": 1.5, "z": 0.0}}],
         label="X-Z plane",
     )
     button3 = dict(
         method="relayout",
-        args=[{"scene.camera.eye": {"x": 2, "y": 0.0, "z": 0.0}}],
+        args=[{"scene.camera.eye": {"x": 1.5, "y": 0.0, "z": 0.0}}],
         label="Y-Z plane",
     )
     scene = (
@@ -104,5 +104,4 @@ def hedgehog(
         scene_camera=camera,
         updatemenus=[dict(buttons=[button0, button1, button2, button3])],
     )
-    fig.show()
     return fig
