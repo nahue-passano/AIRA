@@ -10,11 +10,7 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets, QtWebEngineWidgets
 from PyQt5.QtWidgets import (
-    QApplication,
-    QMainWindow,
     QLabel,
-    QPushButton,
-    QVBoxLayout,
     QFileDialog,
 )
 from PyQt5.QtGui import QPixmap
@@ -28,17 +24,6 @@ from aira.engine.input import InputMode
 INTEGRATION_TIME = 0.01
 
 analyzer = AmbisonicsImpulseResponseAnalyzer(integration_time=INTEGRATION_TIME)
-
-data = {
-    "front_left_up": "test/mock_data/regio_theater/soundfield_flu.wav",
-    "front_right_down": "test/mock_data/regio_theater/soundfield_frd.wav",
-    "back_right_up": "test/mock_data/regio_theater/soundfield_bru.wav",
-    "back_left_down": "test/mock_data/regio_theater/soundfield_bld.wav",
-    "inverse_filter": "test/mock_data/regio_theater/soundfield_inverse_filter.wav",
-    "input_mode": InputMode.LSS,
-    "channels_per_file": 1,
-    "frequency_correction": True,
-}
 
 
 class Ui_MainWindow(object):
@@ -133,7 +118,9 @@ class Ui_MainWindow(object):
         font.setPointSize(24)
         self.label_logo_main.setFont(font)
         self.label_logo_main.setText("")
-        self.label_logo_main.setPixmap(QtGui.QPixmap(str(Path("docs/images/aira-logo.png"))))
+        self.label_logo_main.setPixmap(
+            QtGui.QPixmap(str(Path("docs/images/aira-logo.png")))
+        )
         self.label_logo_main.setScaledContents(True)
         self.label_logo_main.setAlignment(QtCore.Qt.AlignCenter)
         self.label_logo_main.setObjectName("label_logo_main")
@@ -667,7 +654,9 @@ class Ui_MainWindow(object):
         self.label_logo_plan = QtWidgets.QLabel(self.frame_logo_plan)
         self.label_logo_plan.setGeometry(QtCore.QRect(30, 20, 141, 41))
         self.label_logo_plan.setText("")
-        self.label_logo_plan.setPixmap(QtGui.QPixmap(str(Path("docs/images/aira-logo.png"))))
+        self.label_logo_plan.setPixmap(
+            QtGui.QPixmap(str(Path("docs/images/aira-logo.png")))
+        )
         self.label_logo_plan.setScaledContents(True)
         self.label_logo_plan.setObjectName("label_logo_plan")
         self.verticalLayout_10.addWidget(self.frame_plan_header)
@@ -814,6 +803,18 @@ class Ui_MainWindow(object):
         self.tabWidget.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
+        # CONEXIONES DE GUI CON ACCIONES
+
+        # Creo los labels para guardar la data que devuelven las funciones de import triggereadas
+        self.path_1 = QLabel()
+        self.path_2 = QLabel()
+        self.path_3 = QLabel()
+        self.path_4 = QLabel()
+        self.path_5 = QLabel()
+        self.input_mode_selected = QLabel()
+        self.channels_per_file_selected = QLabel()
+
+        self.actionImport_LSS.triggered.connect(self.import_LSS)
         self.actionImport_Aformat_1channel.triggered.connect(
             self.import_Aformat_1channel
         )
@@ -826,7 +827,7 @@ class Ui_MainWindow(object):
         self.actionImport_Bformat_4channels.triggered.connect(
             self.import_Bformat_4channels
         )
-        self.actionImport_LSS.triggered.connect(self.import_LSS)
+
         self.pb_analyze.clicked.connect(self.analyze)
         self.pB_load_plan.clicked.connect(self.load_plan)
         self.pB_export_plan.clicked.connect(self.export_plan)
@@ -883,11 +884,79 @@ class Ui_MainWindow(object):
     # Acá empiezan los métodos para las acciones del usuario
 
     def analyze(self):
+        if self.input_mode_selected.text() == "LSS":
+            input_mode = InputMode.LSS
+            FLU_path = self.path_1.text()
+            FRD_path = self.path_2.text()
+            BRU_path = self.path_3.text()
+            BLD_path = self.path_4.text()
+            IF_path = self.path_5.text()
+            channels_per_file = 1
+            data = {
+                "front_left_up": FLU_path,
+                "front_right_down": FRD_path,
+                "back_right_up": BRU_path,
+                "back_left_down": BLD_path,
+                "inverse_filter": IF_path,
+                "input_mode": input_mode,
+                "channels_per_file": channels_per_file,
+                "frequency_correction": True,
+            }
+        elif self.input_mode_selected.text() == "AFORMAT":
+            input_mode = InputMode.AFORMAT
+            if self.channels_per_file_selected.text() == "1":
+                FLU_path = self.path_1.text()
+                FRD_path = self.path_2.text()
+                BRU_path = self.path_3.text()
+                BLD_path = self.path_4.text()
+                channels_per_file = 1
+                data = {
+                    "front_left_up": FLU_path,
+                    "front_right_down": FRD_path,
+                    "back_right_up": BRU_path,
+                    "back_left_down": BLD_path,
+                    "input_mode": input_mode,
+                    "channels_per_file": channels_per_file,
+                    "frequency_correction": True,
+                }
+            else:
+                A4_path = self.path_1.text()
+                channels_per_file = 4
+                data = {
+                    "stacked_signals": A4_path,
+                    "input_mode": input_mode,
+                    "channels_per_file": channels_per_file,
+                    "frequency_correction": True,
+                }
+        else:
+            input_mode = InputMode.BFORMAT
+            if self.channels_per_file_selected.text() == "1":
+                W_path = self.path_1.text()
+                X_path = self.path_2.text()
+                Y_path = self.path_3.text()
+                Z_path = self.path_4.text()
+                channels_per_file = 1
+                data = {
+                    "channel_w": W_path,
+                    "channel_X": X_path,
+                    "channel_Y": Y_path,
+                    "channel_Z": Z_path,
+                    "input_mode": input_mode,
+                    "channels_per_file": channels_per_file,
+                    "frequency_correction": True,
+                }
+            else:
+                B4_path = self.path_1.text()
+                channels_per_file = 4
+                data = {
+                    "stacked_signals": B4_path,
+                    "input_mode": input_mode,
+                    "channels_per_file": channels_per_file,
+                    "frequency_correction": True,
+                }
 
         fig = analyzer.analyze(input_dict=data)
-
         self.gV_hedgehog.setHtml(fig.to_html(include_plotlyjs="cdn"))
-        
 
     def load_plan(self):
         file_dialog = QFileDialog()
@@ -932,18 +1001,27 @@ class Ui_MainWindow(object):
         file_path_FRD, _ = file_dialog.getOpenFileName(
             MainWindow, "Select channel Front-Right-Down", "", "WAV file (*.wav)"
         )
-        file_path_BLD, _ = file_dialog.getOpenFileName(
-            MainWindow, "Select channel Back-Left-Down", "", "WAV file (*.wav)"
-        )
         file_path_BRU, _ = file_dialog.getOpenFileName(
             MainWindow, "Select channel Back-Right-Up", "", "WAV file (*.wav)"
         )
+        file_path_BLD, _ = file_dialog.getOpenFileName(
+            MainWindow, "Select channel Back-Left-Down", "", "WAV file (*.wav)"
+        )
+        self.path_1.setText(file_path_FLU)
+        self.path_2.setText(file_path_FRD)
+        self.path_3.setText(file_path_BRU)
+        self.path_4.setText(file_path_BLD)
+        self.input_mode_selected.setText("AFORMAT")
+        self.channels_per_file_selected.setText("1")
 
     def import_Aformat_4channels(self):
         file_dialog = QFileDialog()
         file_path_A4, _ = file_dialog.getOpenFileName(
             MainWindow, "Select audio file", "", "WAV file (*.wav)"
         )
+        self.path_1.setText(file_path_A4)
+        self.input_mode_selected.setText("AFORMAT")
+        self.channels_per_file_selected.setText("4")
 
     def import_Bformat_1channel(self):
         file_dialog = QFileDialog()
@@ -959,12 +1037,21 @@ class Ui_MainWindow(object):
         file_path_Z, _ = file_dialog.getOpenFileName(
             MainWindow, "Select channel Z", "", "WAV file (*.wav)"
         )
+        self.path_1.setText(file_path_W)
+        self.path_2.setText(file_path_X)
+        self.path_3.setText(file_path_Y)
+        self.path_4.setText(file_path_Z)
+        self.input_mode_selected.setText("BFORMAT")
+        self.channels_per_file_selected.setText("1")
 
     def import_Bformat_4channels(self):
         file_dialog = QFileDialog()
         file_path_B4, _ = file_dialog.getOpenFileName(
             MainWindow, "Select audio file", "", "WAV file (*.wav)"
         )
+        self.path_1.setText(file_path_B4)
+        self.input_mode_selected.setText("BFORMAT")
+        self.channels_per_file_selected.setText("4")
 
     def import_LSS(self):
         file_dialog = QFileDialog()
@@ -974,14 +1061,27 @@ class Ui_MainWindow(object):
         file_path_FRD, _ = file_dialog.getOpenFileName(
             MainWindow, "Select channel Front-Right-Down", "", "WAV file (*.wav)"
         )
-        file_path_BLD, _ = file_dialog.getOpenFileName(
-            MainWindow, "Select channel Back-Left-Down", "", "WAV file (*.wav)"
-        )
         file_path_BRU, _ = file_dialog.getOpenFileName(
             MainWindow, "Select channel Back-Right-Up", "", "WAV file (*.wav)"
         )
+        file_path_BLD, _ = file_dialog.getOpenFileName(
+            MainWindow, "Select channel Back-Left-Down", "", "WAV file (*.wav)"
+        )
         file_path_IF, _ = file_dialog.getOpenFileName(
             MainWindow, "Select inverse filter", "", "WAV file (*.wav)"
+        )
+        self.path_1.setText(file_path_FLU)
+        self.path_2.setText(file_path_FRD)
+        self.path_3.setText(file_path_BRU)
+        self.path_4.setText(file_path_BLD)
+        self.path_5.setText(file_path_IF)
+        self.input_mode_selected.setText("LSS")
+        self.channels_per_file_selected.setText("1")
+
+    def export_hedgehog(self):
+        file_dialog = QFileDialog()
+        save_path, _ = file_dialog.getSaveFileName(
+            MainWindow, "Export image", "", "Image file (*.png *.jpg *.jpeg)"
         )
 
 
