@@ -28,6 +28,8 @@ Here are some previews
     python3 aira/gui.py
     ```
 
+> **Usage note:** In case you do not have your own measurements, import test measurements from `test/mock_data/regio_theater`
+
 ---
 
 ## 🌱 **Getting started (develop)**
