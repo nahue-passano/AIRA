@@ -1,14 +1,18 @@
 <img src="docs/images/aira-banner.png" alt="AIRA banner" style="display: block; margin: 0 auto; width:600px"/>
 
+[![License: GPL v2](https://img.shields.io/badge/License-GPL_v2-blue.svg)](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html)
 
 ---
+
 AIRA (Ambisonics Impulse Response Analyzer) is a novel software for visualizing impulse responses measured from Ambisonics microphones. Its innovative and interactive ui allows you to examine the reflections at a point with a hedgehog-type graph. It is also possible to export the graphs and print them on a floor plan of the analyzed room.
 
-Here are some previews
+Here are some previews:
 
 
 <img src="docs/images/aira-gui.png" alt="AIRA gui" style="display: block; margin: 0 auto; width:800px"/>
 
+
+  
 ---
 ## 🆕 **Demo running**
 1. Download the repository
