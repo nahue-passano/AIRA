@@ -12,6 +12,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets, QtWebEngineWidgets
 from PyQt5.QtWidgets import (
     QLabel,
     QFileDialog,
+    QMessageBox,
 )
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtCore import Qt
@@ -257,6 +258,7 @@ class Ui_MainWindow(object):
         font.setPointSize(12)
         self.rB_1ms.setFont(font)
         self.rB_1ms.setObjectName("rB_1ms")
+        self.rB_1ms.setChecked(True)
         self.verticalLayout_6.addWidget(self.rB_1ms)
         self.rB_5ms = QtWidgets.QRadioButton(self.frame_analyze)
         palette = QtGui.QPalette()
@@ -425,6 +427,7 @@ class Ui_MainWindow(object):
         self.label_analysis_length.setObjectName("label_analysis_length")
         self.verticalLayout_6.addWidget(self.label_analysis_length)
         self.lineEdit_aLength = QtWidgets.QLineEdit(self.frame_analyze)
+        self.lineEdit_aLength.setText("100")
         font = QtGui.QFont()
         font.setFamily("Lato")
         font.setPointSize(10)
@@ -491,7 +494,7 @@ class Ui_MainWindow(object):
         self.lineEdit_threshold.setStyleSheet(
             "background-color: rgb(255, 255, 255);\n" "\n" ""
         )
-        self.lineEdit_threshold.setText("")
+        self.lineEdit_threshold.setText("60")
         self.lineEdit_threshold.setObjectName("lineEdit_threshold")
         self.verticalLayout_6.addWidget(self.lineEdit_threshold)
         spacerItem5 = QtWidgets.QSpacerItem(
@@ -676,6 +679,10 @@ class Ui_MainWindow(object):
         self.label_plan_view.setText("")
         self.label_plan_view.setObjectName("label_plan_view")
         self.label_plan_view.setAlignment(Qt.AlignCenter)
+        pixmap = QPixmap(str(Path("docs/images/aira-banner.png")))
+        self.label_plan_view.setPixmap(
+            pixmap.scaled(750, 3000, aspectRatioMode=Qt.KeepAspectRatio)
+        )
         # self.label_plan_view.addWidget(self.label_plan_view)
         self.horizontalLayout_6.addWidget(self.label_plan_view)
         self.horizontalLayout_5.addWidget(self.frame_plan_view)

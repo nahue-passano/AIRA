@@ -80,8 +80,11 @@ def integrate_intensity_directions(
     intensity_windowed = np.zeros(output_shape)
     window = np.hamming(duration_samples)
     for i in range(0, output_shape[1]):
+        # intensity_segment = intensity_directions[
+        #    :, i * duration_samples : (i + 1) * duration_samples
+        # ]
         intensity_segment = intensity_directions[
-            :, i * duration_samples : (i + 1) * duration_samples
+            :, i : i + duration_samples
         ]
         intensity_windowed[:, i] = np.sum(intensity_segment * window, axis=1)
 

@@ -22,7 +22,7 @@ class AmbisonicsImpulseResponseAnalyzer:
     bformat_frequency_correction: bool = True
     input_builder = InputProcessorChain()
 
-    def analyze(self, input_dict: dict):
+    def analyze(self, input_dict: dict, show: bool = False):
         """Analyzes a set of measurements in Ambisonics format and plots a hedgehog
         with the estimated reflections direction.
 
@@ -67,7 +67,8 @@ class AmbisonicsImpulseResponseAnalyzer:
         )
 
         # print(f">> Ploted successfully")
-
+        if show:
+            fig.show()
         return fig
 
 
@@ -93,4 +94,4 @@ if __name__ == "__main__":
     # }
 
     analyzer = AmbisonicsImpulseResponseAnalyzer()
-    analyzer.analyze(data)
+    analyzer.analyze(data,show=True)
