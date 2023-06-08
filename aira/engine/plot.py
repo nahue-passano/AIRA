@@ -79,6 +79,22 @@ def hedgehog(
         args=[{"scene.camera.eye": {"x": 2, "y": 0.0, "z": 0.0}}],
         label="Y-Z plane",
     )
+    scene = (
+        dict(
+            xaxis=dict(
+                nticks=4,
+                range=[-1, 1],
+            ),
+            yaxis=dict(
+                nticks=4,
+                range=[-1, 1],
+            ),
+            zaxis=dict(
+                nticks=4,
+                range=[-1, 1],
+            ),
+        ),
+    )
 
     fig.update_layout(
         template="plotly_dark",

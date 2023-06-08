@@ -80,8 +80,10 @@ def integrate_intensity_directions(
     intensity_windowed = np.zeros(output_shape)
     window = np.hamming(duration_samples)
     for i in range(0, output_shape[1]):
-        intensity_segment = intensity_directions[:, i : i + duration_samples]
-        intensity_windowed[:, i] = np.mean(intensity_segment * window, axis=1)
+        intensity_segment = intensity_directions[
+            :, i * duration_samples : (i + 1) * duration_samples
+        ]
+        intensity_windowed[:, i] = np.sum(intensity_segment * window, axis=1)
 
     return intensity_windowed
 
@@ -121,6 +123,6 @@ def convert_bformat_to_intensity(
     azimuth = np.rad2deg(
         np.arctan(intensity_windowed[1] / intensity_windowed[0])
     ).squeeze()
-    elevation = np.rad2deg(np.arctan(intensity_windowed[2] / intensity)).squeeze()
+    elevation = np.rad2deg(np.arccos(intensity_windowed[2] / intensity)).squeeze()
 
     return intensity, azimuth, elevation

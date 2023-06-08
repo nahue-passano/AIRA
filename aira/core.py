@@ -8,6 +8,7 @@ from aira.engine.plot import hedgehog
 from aira.engine.reflections import get_hedgehog_arrays
 from aira.utils import read_signals_dict
 
+
 INTEGRATION_TIME = 0.01
 INTENSITY_THRESHOLD = 60
 
@@ -40,8 +41,6 @@ class AmbisonicsImpulseResponseAnalyzer:
         # print(">> Signals loaded")
 
         bformat_signals = self.input_builder.process(input_dict)
-
-        # print(">> Input preprocessed")
 
         intensity, azimuth, elevation = convert_bformat_to_intensity(
             bformat_signals, signals_dict["sample_rate"], self.integration_time
