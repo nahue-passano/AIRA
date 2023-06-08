@@ -9,6 +9,38 @@ from aira.engine.filtering import apply_low_pass_filter
 FILTER_CUTOFF = 5000
 
 
+def intensity_to_dB(intensity_array: np.ndarray) -> np.ndarray:
+    """Converts intensity to dB scale using 1e-12 as intensity reference
+
+    Parameters
+    ----------
+    intensity_array : np.ndarray
+        Intensity array
+
+    Returns
+    -------
+    np.ndarray
+        Intensity array in dB scale
+    """
+    return 10 * np.log10(intensity_array / 1e-12)
+
+
+def min_max_normalization(array: np.ndarray) -> np.ndarray:
+    """Returns the input array normalized by its minimum and maximum value.
+
+    Parameters
+    ----------
+    array : np.ndarray
+        Array to be normalized
+
+    Returns
+    -------
+    np.ndarray
+        Array normalized
+    """
+    return (array - array.min()) / (array.max() - array.min())
+
+
 def integrate_intensity_directions(
     intensity_directions: np.ndarray,
     duration_secs: float,
@@ -31,7 +63,6 @@ def integrate_intensity_directions(
 
     # Convert integration time to samples
     duration_samples = np.round(duration_secs * sample_rate).astype(np.int64)
-    duration_samples = duration_samples.astype(np.int64)
 
     # Peak scanning: keep only from the leftmost highest peak to the end of the signal
     earliest_peak_index = np.argmax(np.abs(intensity_directions), axis=1).min()
@@ -49,8 +80,13 @@ def integrate_intensity_directions(
     intensity_windowed = np.zeros(output_shape)
     window = np.hamming(duration_samples)
     for i in range(0, output_shape[1]):
-        intensity_segment = intensity_directions[:, i : i + duration_samples]
-        intensity_windowed[:, i] = np.max(intensity_segment * window, axis=1)
+        # intensity_segment = intensity_directions[
+        #    :, i * duration_samples : (i + 1) * duration_samples
+        # ]
+        intensity_segment = intensity_directions[
+            :, i : i + duration_samples
+        ]
+        intensity_windowed[:, i] = np.sum(intensity_segment * window, axis=1)
 
     return intensity_windowed
 
@@ -90,6 +126,6 @@ def convert_bformat_to_intensity(
     azimuth = np.rad2deg(
         np.arctan(intensity_windowed[1] / intensity_windowed[0])
     ).squeeze()
-    elevation = np.rad2deg(np.arctan(intensity_windowed[2] / intensity)).squeeze()
+    elevation = np.rad2deg(np.arccos(intensity_windowed[2] / intensity)).squeeze()
 
     return intensity, azimuth, elevation

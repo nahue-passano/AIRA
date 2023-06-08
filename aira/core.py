@@ -1,6 +1,4 @@
 """Core processing for AIRA module."""
-import logging
-import time
 from dataclasses import dataclass
 
 
@@ -11,14 +9,7 @@ from aira.engine.reflections import get_hedgehog_arrays
 from aira.utils import read_signals_dict
 
 
-logging.basicConfig(
-    filename="aira.log",
-    filemode="w",
-    format="%(name)s - %(levelname)s - %(message)s",
-    level=logging.INFO,
-)
-
-INTEGRATION_TIME = 0.001
+INTEGRATION_TIME = 0.01
 INTENSITY_THRESHOLD = 60
 
 
@@ -31,28 +22,7 @@ class AmbisonicsImpulseResponseAnalyzer:
     bformat_frequency_correction: bool = True
     input_builder = InputProcessorChain()
 
-    def _log_settings(self) -> None:
-        logging.info("Settings:")
-        logging.info(f">> Integration time: {self.integration_time}")
-        logging.info(f">> Intensity theshold: {self.intensity_threshold}")
-
-    @staticmethod
-    def _timer(time_reference: float) -> float:
-        """Counters the running time given a time reference
-
-        Parameters
-        ----------
-        time_reference : float
-            Time reference to be based
-
-        Returns
-        -------
-        float
-            Time difference with time_reference
-        """
-        return round(time.time() - time_reference, 3)
-
-    def analyze(self, input_dict: dict):
+    def analyze(self, input_dict: dict, show: bool = False):
         """Analyzes a set of measurements in Ambisonics format and plots a hedgehog
         with the estimated reflections direction.
 
@@ -62,43 +32,33 @@ class AmbisonicsImpulseResponseAnalyzer:
             Dictionary with all the data needed to analyze a set of measurements
             (paths of the measurements, input mode, channels per file, etc.)
         """
-        self._log_settings()
-        logging.info("Analyzing input files:")
-        for key, value in input_dict.items():
-            logging.info(f">> {key}: {value}")
+        # print("Analyzing input files:")
+        # for key, value in input_dict.items():
+        # print(f">> {key}: {value}")
 
-        read_signals_time = time.time()
         signals_dict = read_signals_dict(input_dict)
-        logging.info("Run info")
-        logging.info(f">> Signals loaded - Done in {self._timer(read_signals_time)} s")
+        # print("Run info")
+        # print(">> Signals loaded")
 
-        bformat_preprocessing_time = time.time()
         bformat_signals = self.input_builder.process(input_dict)
 
-        logging.info(
-            f">> Input preprocessed - Done in {self._timer(bformat_preprocessing_time)} s"
-        )
-
-        bformat_to_intensity_time = time.time()
         intensity, azimuth, elevation = convert_bformat_to_intensity(
             bformat_signals, signals_dict["sample_rate"], self.integration_time
         )
 
-        logging.info(
-            f">> Intensity arrays generated - Done in {self._timer(bformat_to_intensity_time)} s"
-        )
+        # print(">> Intensity arrays generated")
 
-        hedgehog_arrays_time = time.time()
-        masked_intensity, masked_azimuth, masked_elevation = get_hedgehog_arrays(
-            intensity, azimuth, elevation
-        )
+        (
+            masked_intensity,
+            masked_azimuth,
+            masked_elevation,
+            reflections_indeces,
+        ) = get_hedgehog_arrays(intensity, azimuth, elevation)
 
-        logging.info(
-            f">> Hedgehog arrays generated - Done in {self._timer(hedgehog_arrays_time)} s"
-        )
+        # print(">> Hedgehog arrays generated")
 
-        plot_time = time.time()
         fig = hedgehog(
+            reflections_indeces,
             masked_intensity,
             masked_azimuth,
             masked_elevation,
@@ -106,9 +66,9 @@ class AmbisonicsImpulseResponseAnalyzer:
             bformat_signals.shape[1] / signals_dict["sample_rate"],
         )
 
-        logging.info(f">> Ploted successfully - Done in {self._timer(plot_time)} s")
-        logging.info(f"Run time: {self._timer(read_signals_time)} s")
-
+        # print(f">> Ploted successfully")
+        if show:
+            fig.show()
         return fig
 
 
@@ -134,4 +94,4 @@ if __name__ == "__main__":
     # }
 
     analyzer = AmbisonicsImpulseResponseAnalyzer()
-    analyzer.analyze(data)
+    analyzer.analyze(data,show=True)

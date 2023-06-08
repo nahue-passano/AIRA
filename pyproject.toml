@@ -16,6 +16,10 @@ soundfile = "^0.12.1"
 plotly = "^5.14.1"
 pandas = "^2.0.1"
 kaleido = "0.2.1"
+matplotlib = "^3.7.1"
+pyqt5 = "^5.15.9"
+pyqtwebengine = "^5.15.6"
+
 
 [tool.poetry.dev-dependencies]
 black = "^23.3.0"
