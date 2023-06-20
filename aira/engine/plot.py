@@ -61,8 +61,11 @@ def hedgehog(
         scene={
             "aspectmode": "cube",
             "xaxis": {"zerolinecolor": "white", "showbackground": False},
+            "xaxis_title": " ◀️ Front - Rear ▶",
             "yaxis": {"zerolinecolor": "white", "showbackground": False},
+            "yaxis_title": " ◀️ Right - Left ▶",
             "zaxis": {"zerolinecolor": "white", "showbackground": False},
+            "zaxis_title": " ◀️ Up - Down ▶",
         },
     )
     return fig
