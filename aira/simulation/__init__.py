@@ -131,6 +131,7 @@ class AmbisonicsAFormatMicrophone:
         return self.back_right_up.add_to_pyroomacoustics_room(room)
 
 
+# Example room design and simulation
 desired_rt60 = 1.5  # seconds
 room_dimensions = [13, 11.5, 6]  # X (front-back), Y (left-right), Z (up-down) [meters]
 
@@ -141,12 +142,13 @@ e_absorption, max_order = pra.inverse_sabine(desired_rt60, room_dimensions)
 room = pra.ShoeBox(
     room_dimensions, fs=16000, materials=pra.Material(e_absorption), max_order=max_order
 )
+
+# Design the A-Format microphone
 ambi_mic = AmbisonicsAFormatMicrophone(
     location_meters=[room_dimensions[0] - 5.9, 5.75, 2.0], radius_cm=2
 )
 print(ambi_mic)
 room = ambi_mic.add_to_pyroomacoustics_room(room)
-print(f"Microphones:\n", room.mic_array)
 
 source_s1_location = [room_dimensions[0] - 2.3, 5.75, 3.2]
 source_directivity = pra.CardioidFamily(
@@ -154,6 +156,8 @@ source_directivity = pra.CardioidFamily(
     pattern_enum=pra.directivities.DirectivityPattern.CARDIOID,
 )
 room.add_source(source_s1_location, directivity=source_directivity)
+room.plot()
+plt.show()
 
 room.compute_rir()
 
