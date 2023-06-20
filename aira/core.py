@@ -2,23 +2,22 @@
 from dataclasses import dataclass
 import numpy as np
 
-
 from aira.engine.input import InputProcessorChain, InputMode
 from aira.engine.intensity import (
     convert_bformat_to_intensity,
-    analysis_crop,
+    analysis_crop_2d,
     integrate_intensity_directions,
-    get_intensity_polar_data,
     intensity_thresholding,
 )
-from aira.engine.plot import hedgehog
+from aira.engine.pressure import w_channel_preprocess
+from aira.engine.plot import hedgehog, w_channel, setup_plotly_layout
 from aira.engine.reflections import detect_reflections
-from aira.utils import read_signals_dict
+from aira.utils import read_signals_dict, cartesian_to_spherical
 
 
 INTEGRATION_TIME = 0.001
 INTENSITY_THRESHOLD = -60
-ANALYSIS_LENGTH = 0.100
+ANALYSIS_LENGTH = 1
 
 
 @dataclass
@@ -57,19 +56,17 @@ class AmbisonicsImpulseResponseAnalyzer:
 
         bformat_signals = self.input_builder.process(input_dict)
 
-        intensity_directions = convert_bformat_to_intensity(
-            bformat_signals, sample_rate
-        )
+        intensity_directions = convert_bformat_to_intensity(bformat_signals)
 
-        intensity_directions_cropped = analysis_crop(
+        intensity_directions_cropped = analysis_crop_2d(
             analysis_length, sample_rate, intensity_directions
         )
 
-        intensity_windowed = integrate_intensity_directions(
+        intensity_windowed, time = integrate_intensity_directions(
             intensity_directions_cropped, integration_time, sample_rate
         )
 
-        intensity, azimuth, elevation = get_intensity_polar_data(intensity_windowed)
+        intensity, azimuth, elevation = cartesian_to_spherical(intensity_windowed)
 
         (
             intensity_peaks,
@@ -91,9 +88,25 @@ class AmbisonicsImpulseResponseAnalyzer:
             reflections_idx,
         )
 
-        time = np.arange(0, analysis_length, 1 / sample_rate)[reflections_idx]
+        time = time[reflections_idx]
 
-        fig = hedgehog(time, reflex_to_direct, azimuth_peaks, elevation_peaks)
+        fig = setup_plotly_layout()
+
+        hedgehog(fig, time, reflex_to_direct, azimuth_peaks, elevation_peaks)
+
+        w_channel_signal = w_channel_preprocess(
+            bformat_signals[0, :],
+            int(integration_time * sample_rate),
+            analysis_length,
+            sample_rate,
+        )
+
+        w_channel(
+            fig,
+            np.arange(0, analysis_length, 1 / sample_rate) * 1000,
+            w_channel_signal,
+            intensity_threshold,
+        )
 
         if show:
             fig.show()
@@ -113,9 +126,9 @@ if __name__ == "__main__":
         "frequency_correction": True,
     }
 
-    # # York auditorium
+    # York auditorium
     # data = {
-    #     "stacked_signals": "test/mock_data/york_auditorium/s1r2.wav",
+    #     "stacked_signals": "test/mock_data/york_auditorium/s2r2.wav",
     #     "input_mode": InputMode.BFORMAT,
     #     "channels_per_file": 4,
     #     "frequency_correction": False,

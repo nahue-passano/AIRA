@@ -28,6 +28,7 @@ def read_signals_dict(signals_dict: dict) -> dict:
             signals_dict[key_i] = signal_i.T
         except:
             pass
+
     signals_dict["sample_rate"] = sample_rate
 
     if signals_dict["channels_per_file"] == 1:
