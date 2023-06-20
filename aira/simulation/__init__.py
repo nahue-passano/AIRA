@@ -4,12 +4,14 @@ import matplotlib.pyplot as plt
 import numpy as np
 from collections import namedtuple
 from dataclasses import dataclass, field
-from typing import Dict
+from typing import Dict, List
 from copy import deepcopy
 
 from aira.utils import convert_polar_to_cartesian, convert_ambisonics_a_to_b
 
-CartesianCoordinates = namedtuple("CartesianCoordinates", "x y z")
+CartesianCoordinates = namedtuple(
+    "CartesianCoordinates", "x y z"
+)  # not used, array preferred
 AFORMAT_CAPSULES = (
     "front_left_up",
     "front_right_down",
@@ -36,7 +38,7 @@ class Directivity:
 
 @dataclass
 class Microphone:
-    location: CartesianCoordinates
+    location: np.ndarray
     directivity: Directivity
 
     def add_to_pyroomacoustics_room(self, room: pra.Room) -> pra.Room:
@@ -61,31 +63,29 @@ class AmbisonicsAFormatMicrophone:
     def get_aformat_capsule_directivities(
         cls,
     ) -> Dict[str, dict]:
-        altitude_up = np.deg2rad(35.26)
+        altitude_up = 35.26
         altitude_down = -altitude_up
 
-        azimuth_left = np.deg2rad(45)
-        azimuth_right = -azimuth_left
+        azimuth_right = 45
+        azimuth_left = -azimuth_right
 
         return {
             "front_left_up": {"azimuth": azimuth_left, "altitude": altitude_up},
             "front_right_down": {"azimuth": azimuth_right, "altitude": altitude_down},
-            "back_right_up": {"azimuth": azimuth_right - 90, "altitude": altitude_up},
-            "back_left_down": {"azimuth": 90 + azimuth_left, "altitude": altitude_down},
+            "back_right_up": {"azimuth": azimuth_right + 90, "altitude": altitude_up},
+            "back_left_down": {"azimuth": azimuth_left - 90, "altitude": altitude_down},
         }
 
     @classmethod
-    def get_aformat_capsule_translations(
-        cls, radius
-    ) -> Dict[str, CartesianCoordinates]:
+    def get_aformat_capsule_translations(cls, radius) -> Dict[str, np.ndarray]:
         capsule_angles = cls.get_aformat_capsule_directivities()
         return {
             capsule: np.array(
                 [
                     *convert_polar_to_cartesian(
                         radius,
-                        capsule_angles[capsule]["azimuth"],
-                        capsule_angles[capsule]["altitude"],
+                        np.deg2rad(capsule_angles[capsule]["azimuth"]),
+                        np.deg2rad(capsule_angles[capsule]["altitude"]),
                     )
                 ]
             )
@@ -142,9 +142,11 @@ room = pra.ShoeBox(
     room_dimensions, fs=16000, materials=pra.Material(e_absorption), max_order=max_order
 )
 ambi_mic = AmbisonicsAFormatMicrophone(
-    location_meters=[room_dimensions[0] - 5.9, 5.75, 2.0], radius_cm=0.02
+    location_meters=[room_dimensions[0] - 5.9, 5.75, 2.0], radius_cm=2
 )
+print(ambi_mic)
 room = ambi_mic.add_to_pyroomacoustics_room(room)
+print(f"Microphones:\n", room.mic_array)
 
 source_s1_location = [room_dimensions[0] - 2.3, 5.75, 3.2]
 source_directivity = pra.CardioidFamily(
