@@ -79,7 +79,7 @@ def _(aformat_channels: List[np.ndarray]) -> np.ndarray:
 def convert_polar_to_cartesian(
     radius: Union[float, np.ndarray],
     azimuth: Union[float, np.ndarray],
-    elevation: Union[float, np.ndarray],
+    altitude: Union[float, np.ndarray],
 ) -> Tuple[Union[float, np.ndarray]]:
     """Convert three 3D polar coordinates to Cartesian ones.
 
@@ -92,7 +92,7 @@ def convert_polar_to_cartesian(
         (x, y, z): Tuple[float | np.ndarray]. The corresponding Cartesian coordinates.
     """
     return (
-        radius * np.cos(azimuth) * np.sin(elevation),
-        radius * np.sin(azimuth) * np.sin(elevation),
-        radius * np.cos(elevation),
+        radius * np.cos(azimuth) * np.cos(altitude),
+        radius * np.sin(azimuth) * np.cos(altitude),
+        radius * np.sin(altitude),
     )
