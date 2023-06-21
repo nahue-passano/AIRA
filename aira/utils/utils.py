@@ -8,10 +8,6 @@ from typing import Dict, List, Tuple, Union
 import numpy as np
 import soundfile as sf
 
-# WARNING: Está codeado como el upite pero quiero probar algunas cosas.
-# Por otro lado, creo que va a ser mejor pasar las seniales dentro de un diccionario,
-# para poder identificar cada canal ambisonics, y ademas el filtro inverso
-
 
 def read_signals_dict(signals_dict: dict) -> dict:
     """Read the signals contained in signals_dict and overwrites the paths with the arrays.
@@ -27,11 +23,12 @@ def read_signals_dict(signals_dict: dict) -> dict:
         Same signals_dict dictionary with the signals array overwritting signals path.
     """
     for key_i, path_i in signals_dict.items():
-        try:  # a puro huevo
+        try:
             signal_i, sample_rate = sf.read(path_i)
             signals_dict[key_i] = signal_i.T
         except:
             pass
+
     signals_dict["sample_rate"] = sample_rate
 
     if signals_dict["channels_per_file"] == 1:
