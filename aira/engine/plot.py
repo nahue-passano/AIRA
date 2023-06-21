@@ -32,9 +32,19 @@ def hedgehog(
             marker={
                 "color": zero_inserter(normalized_intensities),
                 "colorscale": "portland",
+                "colorbar": {
+                    "thickness": 20,
+                    "tickvals": [0.99],
+                    "ticktext": ["Direct          <br>sound          "],
+                    "ticklabelposition": "inside",
+                    "ticksuffix": "                     ",
+                    "ticklabeloverflow": "allow",
+                    "title": {"text": "<b>Time</b>"},
+                },
+                "size": 3,
             },
             line={
-                "width": 6,
+                "width": 8,
                 "color": zero_inserter(normalized_intensities),
                 "colorscale": "portland",
             },
@@ -51,7 +61,7 @@ def hedgehog(
             + "<b>Time [ms]: </b>%{customdata[1]:.2f} ms <br>"
             + "<b>Azimuth [°]: </b>%{customdata[2]:.2f}° <br>"
             + "<b>Elevation [°]: </b>%{customdata[3]:.2f}° <extra></extra>",
-            showlegend=True,
+            showlegend=False,
         ),
         row=1,
         col=1,
@@ -113,7 +123,7 @@ def setup_plotly_layout() -> go.Figure:
         row_heights=[0.85, 0.15],
         vertical_spacing=0.05,
         specs=[[{"type": "scene"}], [{"type": "xy"}]],
-        subplot_titles=("Hedgehog", "W-channel"),
+        subplot_titles=("<b>Hedgehog</b>", "<b>Omnidirectional channel</b>"),
     )
 
     camera, buttons = get_plotly_scenes()
@@ -125,8 +135,8 @@ def setup_plotly_layout() -> go.Figure:
         plot_bgcolor="rgb(49,52,56)",
         scene_camera=camera,
         updatemenus=[{"buttons": buttons}],
+        showlegend=False,
     )
-
     return fig
 
 
@@ -141,29 +151,30 @@ def get_plotly_scenes() -> Tuple[Dict]:
     camera = {
         "up": {"x": 0, "y": 0, "z": 1},
         "center": {"x": 0, "y": 0, "z": 0},
-        "eye": {"x": 1, "y": 1, "z": 0.7},
+        "eye": {"x": 1.3, "y": 1.3, "z": 0.2},
     }
+
     button0 = {
         "method": "relayout",
-        "args": [{"scene.camera.eye": {"x": 1, "y": 1, "z": 0.7}}],
+        "args": [{"scene.camera.eye": {"x": 1.3, "y": 1.3, "z": 0.2}}],
         "label": "3D perspective",
     }
 
     button1 = {
         "method": "relayout",
-        "args": [{"scene.camera.eye": {"x": 0.0, "y": 0.0, "z": 1.5}}],
+        "args": [{"scene.camera.eye": {"x": 0.0, "y": 0.0, "z": 2}}],
         "label": "X-Y plane",
     }
 
     button2 = {
         "method": "relayout",
-        "args": [{"scene.camera.eye": {"x": 0.0, "y": 1.5, "z": 0.0}}],
+        "args": [{"scene.camera.eye": {"x": 0.0, "y": 2, "z": 0.0}}],
         "label": "X-Z plane",
     }
 
     button3 = {
         "method": "relayout",
-        "args": [{"scene.camera.eye": {"x": 1.5, "y": 0.0, "z": 0.0}}],
+        "args": [{"scene.camera.eye": {"x": 2, "y": 0.0, "z": 0.0}}],
         "label": "Y-Z plane",
     }
     buttons = [button0, button1, button2, button3]

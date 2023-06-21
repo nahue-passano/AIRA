@@ -1,6 +1,7 @@
 """Core processing for AIRA module."""
-from dataclasses import dataclass
 import numpy as np
+from dataclasses import dataclass
+from plotly import graph_objects as go
 
 from aira.engine.input import InputProcessorChain, InputMode
 from aira.engine.intensity import (
@@ -15,8 +16,8 @@ from aira.engine.reflections import detect_reflections
 from aira.utils import read_signals_dict, cartesian_to_spherical
 
 
-INTEGRATION_TIME = 0.001
-INTENSITY_THRESHOLD = -60
+INTEGRATION_TIME = 0.005
+INTENSITY_THRESHOLD = -90
 ANALYSIS_LENGTH = 1
 
 
@@ -37,7 +38,7 @@ class AmbisonicsImpulseResponseAnalyzer:
         intensity_threshold: float = INTENSITY_THRESHOLD,
         analysis_length: float = ANALYSIS_LENGTH,
         show: bool = False,
-    ):
+    ) -> go.Figure:
         """Analyzes a set of measurements in Ambisonics format and plots a hedgehog
         with the estimated reflections direction.
 
@@ -46,9 +47,20 @@ class AmbisonicsImpulseResponseAnalyzer:
         input_dict : dict
             Dictionary with all the data needed to analyze a set of measurements
             (paths of the measurements, input mode, channels per file, etc.)
-        integration_time : float
-        intensity_threshold : float
-        analysis_length : float
+        integration_time : float, optional
+            Time frame where intensity vectors are integrated by the mean of them,
+            by default INTEGRATION_TIME
+        intensity_threshold : float, optional
+            Bottom limit for intensity values in dB, by default INTENSITY_THRESHOLD
+        analysis_length : float, optional
+            Total time of analysis from intensity max peak, by default ANALYSIS_LENGTH
+        show : bool, optional
+            Shows plotly figure in browser, by default False
+
+        Returns
+        -------
+        go.Figure
+            Plotly figure with hedgehog and w-channel plot
         """
 
         signals_dict = read_signals_dict(input_dict)
