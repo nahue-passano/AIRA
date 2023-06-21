@@ -123,7 +123,6 @@ class AmbisonicsImpulseResponseAnalyzer:
 
         if show:
             fig.show()
-            self.export_xy_projection(fig)
         return fig
 
     def export_xy_projection(self, fig: go.Figure, img_name: str):

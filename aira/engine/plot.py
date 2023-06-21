@@ -174,7 +174,12 @@ def get_plotly_scenes() -> Tuple[Dict]:
 
     button1 = {
         "method": "relayout",
-        "args": [{"scene.camera.eye": {"x": 0.0, "y": 0.0, "z": 2}}],
+        "args": [
+            {
+                "scene.camera.eye": {"x": 0.0, "y": 0.0, "z": 2},
+                "scene.camera.up": {"x": 0.0, "y": 0.0, "z": 2},
+            }
+        ],
         "label": "X-Y plane",
     }
 
