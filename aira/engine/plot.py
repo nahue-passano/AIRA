@@ -70,11 +70,23 @@ def hedgehog(
     fig.update_layout(
         scene={
             "aspectmode": "cube",
-            "xaxis": {"zerolinecolor": "white", "showbackground": False},
+            "xaxis": {
+                "zerolinecolor": "white",
+                "showbackground": False,
+                "showticklabels": False,
+            },
             "xaxis_title": " ◀️ Front - Rear ▶",
-            "yaxis": {"zerolinecolor": "white", "showbackground": False},
+            "yaxis": {
+                "zerolinecolor": "white",
+                "showbackground": False,
+                "showticklabels": False,
+            },
             "yaxis_title": " ◀️ Right - Left ▶",
-            "zaxis": {"zerolinecolor": "white", "showbackground": False},
+            "zaxis": {
+                "zerolinecolor": "white",
+                "showbackground": False,
+                "showticklabels": False,
+            },
             "zaxis_title": " ◀️ Up - Down ▶",
         },
     )
@@ -179,6 +191,42 @@ def get_plotly_scenes() -> Tuple[Dict]:
     }
     buttons = [button0, button1, button2, button3]
     return camera, buttons
+
+
+def get_xy_projection(fig: go.Figure) -> go.Figure:
+    # Removing omnidireccional channel plot
+    traces = list(fig.data)
+    traces.pop(1)
+
+    # Creating new figure for xy projection
+    new_fig = make_subplots()
+    new_fig.add_trace(traces[0])
+
+    # Removing axes in Scatter plot
+    new_fig.update_layout(
+        scene={
+            "xaxis": {"visible": False},
+            "yaxis": {"visible": False},
+            "zaxis": {"visible": False},
+        }
+    )
+
+    # Removing colorbar
+    new_fig.update_traces(marker_showscale=False)
+
+    # Setting cenital camera and cube mode
+    new_fig.update_layout(
+        scene={"aspectmode": "cube"},
+        scene_camera={
+            "up": {"x": 0, "y": 0, "z": 1.5},
+            "center": {"x": 0, "y": 0, "z": 0},
+            "eye": {"x": 0, "y": 0, "z": 1.5},
+        },
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
+    )
+
+    return new_fig
 
 
 def zero_inserter(array: np.ndarray) -> np.ndarray:

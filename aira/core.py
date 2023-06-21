@@ -2,6 +2,7 @@
 import numpy as np
 from dataclasses import dataclass
 from plotly import graph_objects as go
+from plotly.subplots import make_subplots
 
 from aira.engine.input import InputProcessorChain, InputMode
 from aira.engine.intensity import (
@@ -11,7 +12,7 @@ from aira.engine.intensity import (
     intensity_thresholding,
 )
 from aira.engine.pressure import w_channel_preprocess
-from aira.engine.plot import hedgehog, w_channel, setup_plotly_layout
+from aira.engine.plot import hedgehog, w_channel, setup_plotly_layout, get_xy_projection
 from aira.engine.reflections import detect_reflections
 from aira.utils import read_signals_dict, cartesian_to_spherical
 
@@ -122,7 +123,12 @@ class AmbisonicsImpulseResponseAnalyzer:
 
         if show:
             fig.show()
+            self.export_xy_projection(fig)
         return fig
+
+    def export_xy_projection(self, fig: go.Figure, img_name: str):
+        new_fig = get_xy_projection(fig)
+        new_fig.write_image(img_name, format="png")
 
 
 if __name__ == "__main__":
