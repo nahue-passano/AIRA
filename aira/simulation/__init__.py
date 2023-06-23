@@ -192,9 +192,13 @@ ambi_mic = AmbisonicsAFormatMicrophone(
     sampling_rate_pyroomacoustics=44100,
 )
 print(ambi_mic)
+
 # room = ambi_mic.add_to_pyroomacoustics_room(room)
-# room.mic_array.set_directivity()
-room = room.add_microphone_array(ambi_mic.to_pyroomacoustics_array())
+# this doesn't work because PRA fails to load the directivities..... well done, kids
+
+room = room.add_microphone_array(
+    ambi_mic.to_pyroomacoustics_array()
+)  # this way i force the directivity
 
 source_s1_location = [room_dimensions[0] - 2.3, 5.75, 3.2]
 source_directivity = pra.CardioidFamily(
@@ -202,19 +206,36 @@ source_directivity = pra.CardioidFamily(
     pattern_enum=pra.directivities.DirectivityPattern.CARDIOID,
 )
 room.add_source(source_s1_location, directivity=source_directivity)
-room.plot()
-plt.show()
+# room.plot()
+# plt.show()
 
 room.compute_rir()
+
+max_rir_length: int = 0
+for rir in room.rir:
+    if len(rir[0]) > max_rir_length:
+        max_rir_length = len(rir[0])
+for i, rir in enumerate(room.rir):
+    padded_array = np.zeros((max_rir_length,))
+    if len(rir[0]) < max_rir_length:
+        print(f"RIR number {i} is shorter than {max_rir_length = }")
+        padded_array[: len(rir[0])] = rir[0]
+        rir[0] = padded_array
 
 rir_bformat = convert_ambisonics_a_to_b(
     room.rir[0][0], room.rir[1][0], room.rir[2][0], room.rir[3][0]
 )
 
+# media móvil bien cabeza para plottear rápido
+rir_smoothed = np.zeros_like(rir_bformat)
+for i in range(max_rir_length):
+    rir_smoothed[:, i] = rir_bformat[:, i : i + 5].mean(axis=1)
+
+rir_db = 20 * np.log10(np.abs(rir_smoothed) / np.abs(rir_bformat).max() + 0.001)
 fig, axs = plt.subplots(4, 1, figsize=(18, 10))
-rir_db = 20 * np.log10(rir_bformat / rir_bformat.max(axis=1))
 axs[0].plot(rir_db[0, :])
 axs[1].plot(rir_db[1, :])
 axs[2].plot(rir_db[2, :])
 axs[3].plot(rir_db[3, :])
 fig.show()
+plt.show()
