@@ -1,11 +1,13 @@
+from collections import namedtuple
+from copy import deepcopy
+from dataclasses import dataclass, field
+from enum import Enum
+from typing import Dict, List
+
 import pyroomacoustics as pra
 from pyroomacoustics.directivities import DirectionVector, DirectivityPattern
 import matplotlib.pyplot as plt
 import numpy as np
-from collections import namedtuple
-from dataclasses import dataclass, field
-from typing import Dict, List
-from copy import deepcopy
 
 from aira.utils import convert_polar_to_cartesian, convert_ambisonics_a_to_b
 
@@ -18,6 +20,13 @@ AFORMAT_CAPSULES = (
     "back_right_up",
     "back_left_down",
 )
+
+
+class AFormatCapsules(Enum):
+    FRONT_LEFT_UP = "front_left_up"
+    FRONT_RIGHT_DOWN = "front_right_down"
+    BACK_RIGHT_UP = "back_right_up"
+    BACK_LEFT_DOWN = "back_left_down"
 
 
 @dataclass
@@ -53,6 +62,7 @@ class AmbisonicsAFormatMicrophone:
 
     location_meters: np.ndarray
     radius_cm: float
+    sampling_rate_pyroomacoustics: int = field(default=44100)
     radius_meters: float = field(init=False)
     front_left_up: Microphone = field(init=False)
     front_right_down: Microphone = field(init=False)
@@ -130,6 +140,38 @@ class AmbisonicsAFormatMicrophone:
         room = self.back_left_down.add_to_pyroomacoustics_room(room)
         return self.back_right_up.add_to_pyroomacoustics_room(room)
 
+    def get_capsule(self, capsule: AFormatCapsules) -> Microphone:
+        """Get the microphone corresponding to the given A-Format capsule.
+
+        Arguments
+            capsule (AFormatCapsule): the Enum for the A-Format capsule.
+        Returns
+            (Microphone): an object with information about its location and directivity.
+        """
+        try:
+            return self.__getattribute__(capsule.value)
+        except ValueError as exception:
+            raise ValueError("%s is not a valid A-Format capsule name" % capsule.value)
+
+    def to_pyroomacoustics_array(
+        self,
+    ) -> pra.MicrophoneArray:
+        """Cast the object into a PyRoomAcoustics MicrophoneArray, including cardioid directivities.
+
+        Returns
+            pyroomacoustics.MicrophoneArray
+        """
+        locations = np.zeros((3, 4))  # 3 coordinates, 4 microphones
+        directivities = []
+        for i, capsule in enumerate(AFormatCapsules):
+            microphone = self.get_capsule(capsule)
+            locations[:, i] = microphone.location
+            directivities.append(microphone.directivity.to_pyroomacoustics())
+
+        return pra.MicrophoneArray(
+            locations, fs=self.sampling_rate_pyroomacoustics, directivity=directivities
+        )
+
 
 # Example room design and simulation
 desired_rt60 = 1.5  # seconds
@@ -145,10 +187,14 @@ room = pra.ShoeBox(
 
 # Design the A-Format microphone
 ambi_mic = AmbisonicsAFormatMicrophone(
-    location_meters=[room_dimensions[0] - 5.9, 5.75, 2.0], radius_cm=2
+    location_meters=[room_dimensions[0] - 5.9, 5.75, 2.0],
+    radius_cm=2,
+    sampling_rate_pyroomacoustics=44100,
 )
 print(ambi_mic)
-room = ambi_mic.add_to_pyroomacoustics_room(room)
+# room = ambi_mic.add_to_pyroomacoustics_room(room)
+# room.mic_array.set_directivity()
+room = room.add_microphone_array(ambi_mic.to_pyroomacoustics_array())
 
 source_s1_location = [room_dimensions[0] - 2.3, 5.75, 3.2]
 source_directivity = pra.CardioidFamily(
