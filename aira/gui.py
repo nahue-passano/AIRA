@@ -13,8 +13,9 @@ from PyQt5.QtWidgets import (
     QLabel,
     QFileDialog,
 )
-from PyQt5.QtGui import QPixmap
-from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QPixmap,QPainter, QImage
+from PyQt5.QtCore import Qt, QPoint
+
 from pathlib import Path
 
 from aira.core import AmbisonicsImpulseResponseAnalyzer
@@ -553,19 +554,9 @@ class Ui_MainWindow(object):
         self.verticalLayout_8 = QtWidgets.QVBoxLayout(self.frame_hedgehog)
         self.verticalLayout_8.setContentsMargins(0, 0, 0, 0)
         self.verticalLayout_8.setObjectName("verticalLayout_8")
-        self.frame_hedgehog_label = QtWidgets.QFrame(self.frame_hedgehog)
-        self.frame_hedgehog_label.setMaximumSize(QtCore.QSize(16777215, 42))
-        self.frame_hedgehog_label.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        self.frame_hedgehog_label.setFrameShadow(QtWidgets.QFrame.Raised)
-        self.frame_hedgehog_label.setObjectName("frame_hedgehog_label")
-        self.horizontalLayout_2 = QtWidgets.QHBoxLayout(self.frame_hedgehog_label)
-        self.horizontalLayout_2.setContentsMargins(0, 0, 0, 0)
-        self.horizontalLayout_2.setObjectName("horizontalLayout_2")
         spacerItem11 = QtWidgets.QSpacerItem(
             430, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum
         )
-        self.horizontalLayout_2.addItem(spacerItem11)
-        self.label_hedgehog = QtWidgets.QLabel(self.frame_hedgehog_label)
         palette = QtGui.QPalette()
         brush = QtGui.QBrush(QtGui.QColor(69, 113, 213))
         brush.setStyle(QtCore.Qt.SolidPattern)
@@ -603,19 +594,12 @@ class Ui_MainWindow(object):
         brush = QtGui.QBrush(QtGui.QColor(49, 52, 56))
         brush.setStyle(QtCore.Qt.SolidPattern)
         palette.setBrush(QtGui.QPalette.Disabled, QtGui.QPalette.Window, brush)
-        self.label_hedgehog.setPalette(palette)
         font = QtGui.QFont()
         font.setFamily("Lato")
         font.setPointSize(15)
-        self.label_hedgehog.setFont(font)
-        self.label_hedgehog.setAlignment(QtCore.Qt.AlignCenter)
-        self.label_hedgehog.setObjectName("label_hedgehog")
-        self.horizontalLayout_2.addWidget(self.label_hedgehog)
         spacerItem12 = QtWidgets.QSpacerItem(
             429, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum
         )
-        self.horizontalLayout_2.addItem(spacerItem12)
-        self.verticalLayout_8.addWidget(self.frame_hedgehog_label)
         self.frame_hedgehog_plot = QtWidgets.QFrame(self.frame_hedgehog)
         self.frame_hedgehog_plot.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.frame_hedgehog_plot.setFrameShadow(QtWidgets.QFrame.Raised)
@@ -815,8 +799,6 @@ class Ui_MainWindow(object):
         self.input_mode_selected = QLabel()
         self.channels_per_file_selected = QLabel()
 
-        # Label para guardar la figura que devuelve el Analyzer para que el usuario pueda exportar una captura
-        #self.figure = QLabel()
 
         self.actionImport_LSS.triggered.connect(self.import_LSS)
         self.actionImport_Aformat_1channel.triggered.connect(
@@ -835,6 +817,7 @@ class Ui_MainWindow(object):
         self.pb_analyze.clicked.connect(self.analyze)
         self.pB_load_plan.clicked.connect(self.load_plan)
         self.pB_export_plan.clicked.connect(self.export_plan)
+        self.label_plan_view.mousePressEvent = lambda event: self.mousePressEvent(event)
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
@@ -852,7 +835,7 @@ class Ui_MainWindow(object):
         )
         self.label_threshold.setText(_translate("MainWindow", "Threshold [dB]"))
         self.pb_analyze.setText(_translate("MainWindow", "Analyze"))
-        self.label_hedgehog.setText(_translate("MainWindow", "Hedgehog Plot"))
+
         self.tabWidget.setTabText(
             self.tabWidget.indexOf(self.tab_main), _translate("MainWindow", "Main")
         )
@@ -978,6 +961,7 @@ class Ui_MainWindow(object):
         fig.write_html("out.html")    
         url = QtCore.QUrl.fromLocalFile(str(Path("out.html").resolve()))
         self.gV_hedgehog.load(url)
+        self.plotly_fig = fig
 
         
 
@@ -987,11 +971,40 @@ class Ui_MainWindow(object):
             MainWindow, "Select image", "", "Image file (*.png *.jpg *.jpeg)"
         )
         if file_path:
-            pixmap = QPixmap(file_path)
-            self.label_plan_view.setPixmap(
-                pixmap.scaled(1000, 800, aspectRatioMode=Qt.KeepAspectRatio)
-            )
+            # Cargar la imagen base
+            self.base_image = QImage(file_path)
+            scaled_image = self.base_image.scaled(1000, 800, Qt.AspectRatioMode.KeepAspectRatio)
+
+            # Crear una imagen resultante del mismo tamaño que la imagen base
+            self.result_image = QImage(scaled_image.size(), QImage.Format_ARGB32)
+            self.result_image.fill(0)  # Rellenar con transparencia
+            
+            # Mostrar la imagen base en un QLabel
+            self.label_plan_view.setPixmap(QPixmap.fromImage(scaled_image)) 
+
+            # Ajustar el tamaño del QLabel al tamaño de la imagen base escalada
+            self.label_plan_view.resize(scaled_image.size())
+
             self.enable_export()
+
+    def mousePressEvent(self, event):
+        if event.button() == Qt.LeftButton:
+            # Verificar si el clic ocurrió dentro de los límites de la imagen base
+            if event.x() < self.base_image.width() and event.y() < self.base_image.height():
+                # Cargar la imagen superpuesta
+                overlay_image = QImage("projection.png")
+                overlay_position = QPoint(event.x()-787, event.y()-350)
+                
+                # Dibujar la imagen base en la imagen resultante
+                painter = QPainter(self.result_image)
+                painter.drawImage(0, 0, self.base_image.scaled(1000, 800, Qt.AspectRatioMode.KeepAspectRatio))
+
+                # Dibujar la imagen superpuesta en la imagen resultante
+                painter.drawImage(overlay_position, overlay_image)
+                painter.end()
+
+                # Mostrar la imagen resultante en el QLabel
+                self.label_plan_view.setPixmap(QPixmap.fromImage(self.result_image))
 
     def enable_export(self):
         self.pB_export_plan.setEnabled(True)
@@ -1015,6 +1028,8 @@ class Ui_MainWindow(object):
         save_path, _ = file_dialog.getSaveFileName(
             MainWindow, "Export image", "", "Image file (*.png *.jpg *.jpeg)"
         )
+        if save_path:
+            self.result_image.save(save_path)
 
     def import_Aformat_1channel(self):
         file_dialog = QFileDialog()
@@ -1106,8 +1121,7 @@ class Ui_MainWindow(object):
         save_path, _ = file_dialog.getSaveFileName(
             MainWindow, "Export image", "", "Image file (*.png *.jpg *.jpeg)"
         )
-        fig = self.figure
-        fig.write_image(save_path, 'png', width=1366, height=768, scale=1.0)
+        self.plotly_fig.write_image(save_path, 'png', width=1366, height=768, scale=1.0)
         
 
 
