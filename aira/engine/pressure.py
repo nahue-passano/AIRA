@@ -24,10 +24,12 @@ def w_channel_preprocess(
     np.ndarray
         _description_
     """
-    w_channel_cropped = analysis_crop_1d(w_channel, analysis_length, sample_rate) ** 2
-    w_channel_filtered = moving_average_filter(w_channel_cropped, window_size)
+    w_channel_cropped = np.abs(
+        analysis_crop_1d(w_channel, analysis_length, sample_rate)
+    )
+    w_channel_filtered = moving_average_filter(w_channel_cropped, int(window_size / 2))
     w_channel_filtered /= np.max(w_channel_filtered)
-    return 20 * np.log10(w_channel_filtered)
+    return w_channel_filtered
 
 
 def analysis_crop_1d(

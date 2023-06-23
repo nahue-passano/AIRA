@@ -2,7 +2,6 @@
 import numpy as np
 from dataclasses import dataclass
 from plotly import graph_objects as go
-from plotly.subplots import make_subplots
 
 from aira.engine.input import InputProcessorChain, InputMode
 from aira.engine.intensity import (
@@ -18,7 +17,7 @@ from aira.utils import read_signals_dict, cartesian_to_spherical
 
 
 INTEGRATION_TIME = 0.005
-INTENSITY_THRESHOLD = -90
+INTENSITY_THRESHOLD = -60
 ANALYSIS_LENGTH = 1
 
 
@@ -119,6 +118,7 @@ class AmbisonicsImpulseResponseAnalyzer:
             np.arange(0, analysis_length, 1 / sample_rate) * 1000,
             w_channel_signal,
             intensity_threshold,
+            time,
         )
 
         if show:
@@ -152,4 +152,5 @@ if __name__ == "__main__":
     # }
 
     analyzer = AmbisonicsImpulseResponseAnalyzer()
-    analyzer.analyze(data, show=True)
+    fig = analyzer.analyze(data, show=True)
+    analyzer.export_xy_projection(fig, "projection.png")
