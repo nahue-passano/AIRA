@@ -1,19 +1,20 @@
 from collections import namedtuple
-from copy import deepcopy
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Dict, List
+from typing import Dict
 
 import pyroomacoustics as pra
-from pyroomacoustics.directivities import DirectionVector, DirectivityPattern
+from pyroomacoustics.directivities import DirectionVector
 import matplotlib.pyplot as plt
 import numpy as np
 
-from aira.utils import convert_polar_to_cartesian, convert_ambisonics_a_to_b
+from aira.utils import convert_polar_to_cartesian
 
 CartesianCoordinates = namedtuple(
     "CartesianCoordinates", "x y z"
 )  # not used, array preferred
+
+# TODO: replace every use of the tuple with `AFormatCapsules`. The latter needs to have the sorting implemented.
 AFORMAT_CAPSULES = (
     "front_left_up",
     "front_right_down",
@@ -23,6 +24,8 @@ AFORMAT_CAPSULES = (
 
 
 class AFormatCapsules(Enum):
+    """The four A-Format Ambisonics capsules."""
+
     FRONT_LEFT_UP = "front_left_up"
     FRONT_RIGHT_DOWN = "front_right_down"
     BACK_RIGHT_UP = "back_right_up"
@@ -31,6 +34,8 @@ class AFormatCapsules(Enum):
 
 @dataclass
 class Directivity:
+    """Class for simplifying the interface of a directivity pattern."""
+
     azimuth: float
     altitude: float
 
@@ -47,6 +52,8 @@ class Directivity:
 
 @dataclass
 class Microphone:
+    """Class for storing details of a microphone: location and directivity."""
+
     location: np.ndarray
     directivity: Directivity
 
@@ -73,6 +80,13 @@ class AmbisonicsAFormatMicrophone:
     def get_aformat_capsule_directivities(
         cls,
     ) -> Dict[str, dict]:
+        """Get the directivity details of each of the A-Format cardioid capsules.
+
+        Returns:
+            Dict[str, dict]: a dictionary with each of the A-Format capsule names
+                as keys, and the values are dictionaries with keys `azimuth` and
+                `altitude`.
+        """
         altitude_up = 35.26
         altitude_down = -altitude_up
 
@@ -87,7 +101,19 @@ class AmbisonicsAFormatMicrophone:
         }
 
     @classmethod
-    def get_aformat_capsule_translations(cls, radius) -> Dict[str, np.ndarray]:
+    def get_aformat_capsule_translations(cls, radius: float) -> Dict[str, np.ndarray]:
+        """Get the required translation vector for each capsule of an A-Format
+        Ambisonics microphone with the given radius. The radius is the distance
+        of each capsule to the center of the array.
+
+        Args:
+            radius (float): radius in meters.
+
+        Returns:
+            Dict[str, np.ndarray]: a dictionary with A-Format capsule names as keys and
+                NumPy arrays as values, with the translation vector coordinates (x,y,z)
+                (i.e., arrays of shape (3,)).
+        """
         capsule_angles = cls.get_aformat_capsule_directivities()
         return {
             capsule: np.array(
@@ -103,7 +129,19 @@ class AmbisonicsAFormatMicrophone:
         }
 
     @classmethod
-    def translate_aformat_capsules(cls, location: np.ndarray, radius: float):
+    def translate_aformat_capsules(
+        cls, location: np.ndarray, radius: float
+    ) -> Dict[str, np.ndarray]:
+        """Move each capsule in the microphone based on the reported radius.
+
+        Args:
+            location (np.ndarray): location of the center of the microphone array.
+            radius (float): distance from each capsule to the center of the array, in meters.
+
+        Returns:
+            Dict[str, np.ndarray]: a dictionary with each of the A-Format capsule names as keys
+                and a NumPy array with the capsule coordinates (x, y, z) as values, with shape (3,).
+        """
         capsule_placements = cls.get_aformat_capsule_translations(radius)
         capsule_placements["front_left_up"] += location
         capsule_placements["front_right_down"] += location
@@ -112,6 +150,7 @@ class AmbisonicsAFormatMicrophone:
         return capsule_placements
 
     def __post_init__(self):
+        """Compute each of the four microphones' characteristics."""
         self.radius_meters = self.radius_cm / 100
         capsule_locations = self.translate_aformat_capsules(
             self.location_meters, self.radius_meters
@@ -135,6 +174,17 @@ class AmbisonicsAFormatMicrophone:
         )
 
     def add_to_pyroomacoustics_room(self, room: pra.Room) -> pra.Room:
+        """Add each of the microphones to the PyRoomAcoustics Room. It doesn't work because
+        PyRoomAcoustics forget to load the directivities into the equivalent MicrophoneArray.
+        Use the method `self.to_pyroomacoustics_array()` instead, and add the MicrophoneArray
+        to the Room manually.
+
+        Args:
+            room (pra.Room): PyRoomAcoustics Room.
+
+        Returns:
+            pra.Room: modified Room with each of the microphones loaded.
+        """
         room = self.front_left_up.add_to_pyroomacoustics_room(room)
         room = self.front_right_down.add_to_pyroomacoustics_room(room)
         room = self.back_left_down.add_to_pyroomacoustics_room(room)
@@ -173,69 +223,15 @@ class AmbisonicsAFormatMicrophone:
         )
 
 
-# Example room design and simulation
-desired_rt60 = 1.5  # seconds
-room_dimensions = [13, 11.5, 6]  # X (front-back), Y (left-right), Z (up-down) [meters]
+def plot_rir(rir_array: np.ndarray):
+    """Plot a RIR array.
 
-# We invert Sabine's formula to obtain the parameters for the ISM simulator
-e_absorption, max_order = pra.inverse_sabine(desired_rt60, room_dimensions)
-
-# Create the room
-room = pra.ShoeBox(
-    room_dimensions, fs=16000, materials=pra.Material(e_absorption), max_order=max_order
-)
-
-# Design the A-Format microphone
-ambi_mic = AmbisonicsAFormatMicrophone(
-    location_meters=[room_dimensions[0] - 5.9, 5.75, 2.0],
-    radius_cm=2,
-    sampling_rate_pyroomacoustics=44100,
-)
-print(ambi_mic)
-
-# room = ambi_mic.add_to_pyroomacoustics_room(room)
-# this doesn't work because PRA fails to load the directivities..... well done, kids
-
-room = room.add_microphone_array(
-    ambi_mic.to_pyroomacoustics_array()
-)  # this way i force the directivity
-
-source_s1_location = [room_dimensions[0] - 2.3, 5.75, 3.2]
-source_directivity = pra.CardioidFamily(
-    orientation=DirectionVector(azimuth=-180, colatitude=0),
-    pattern_enum=pra.directivities.DirectivityPattern.CARDIOID,
-)
-room.add_source(source_s1_location, directivity=source_directivity)
-# room.plot()
-# plt.show()
-
-room.compute_rir()
-
-max_rir_length: int = 0
-for rir in room.rir:
-    if len(rir[0]) > max_rir_length:
-        max_rir_length = len(rir[0])
-for i, rir in enumerate(room.rir):
-    padded_array = np.zeros((max_rir_length,))
-    if len(rir[0]) < max_rir_length:
-        print(f"RIR number {i} is shorter than {max_rir_length = }")
-        padded_array[: len(rir[0])] = rir[0]
-        rir[0] = padded_array
-
-rir_bformat = convert_ambisonics_a_to_b(
-    room.rir[0][0], room.rir[1][0], room.rir[2][0], room.rir[3][0]
-)
-
-# media móvil bien cabeza para plottear rápido
-rir_smoothed = np.zeros_like(rir_bformat)
-for i in range(max_rir_length):
-    rir_smoothed[:, i] = rir_bformat[:, i : i + 5].mean(axis=1)
-
-rir_db = 20 * np.log10(np.abs(rir_smoothed) / np.abs(rir_bformat).max() + 0.001)
-fig, axs = plt.subplots(4, 1, figsize=(18, 10))
-axs[0].plot(rir_db[0, :])
-axs[1].plot(rir_db[1, :])
-axs[2].plot(rir_db[2, :])
-axs[3].plot(rir_db[3, :])
-fig.show()
-plt.show()
+    Arguments
+        rir_array (np.ndarray): a (4, N)-shaped RIR array.
+    """
+    fig, axs = plt.subplots(4, 1, figsize=(18, 10))
+    axs[0].plot(rir_array[0, :])
+    axs[1].plot(rir_array[1, :])
+    axs[2].plot(rir_array[2, :])
+    axs[3].plot(rir_array[3, :])
+    plt.show()
