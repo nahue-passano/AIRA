@@ -2,7 +2,6 @@
 import numpy as np
 from dataclasses import dataclass
 from plotly import graph_objects as go
-from plotly.subplots import make_subplots
 
 from aira.engine.input import InputProcessorChain, InputMode
 from aira.engine.intensity import (
@@ -119,6 +118,7 @@ class AmbisonicsImpulseResponseAnalyzer:
             np.arange(0, analysis_length, 1 / sample_rate) * 1000,
             w_channel_signal,
             intensity_threshold,
+            time,
         )
 
         if show:

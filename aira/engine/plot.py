@@ -94,7 +94,11 @@ def hedgehog(
 
 
 def w_channel(
-    fig: go.Figure, time: np.ndarray, w_channel: np.ndarray, ylim: float
+    fig: go.Figure,
+    time: np.ndarray,
+    w_channel: np.ndarray,
+    ylim: float,
+    time_reflections: np.ndarray,
 ) -> go.Figure:
     """_summary_
 
@@ -112,8 +116,20 @@ def w_channel(
             showlegend=False,
         )
     )
+    fig.add_trace(
+        go.Scatter(
+            mode="markers",
+            marker={"symbol": "star-diamond", "size": 10, "color": "rgb(72,116,212)"},
+            x=time_reflections,
+            y=np.ones_like(time_reflections) * 0.95,
+            customdata=time_reflections,
+            hovertemplate="<b>Time [ms]:</b> %{customdata:.2f} ms <extra></extra>",
+            showlegend=False,
+        )
+    )
+    fig.update_layout(yaxis_range=[0, 1], xaxis_range=[0, max(time)])
     fig.update_xaxes(title_text="Time [ms]", row=2, col=1)
-    fig.update_yaxes(title_text="Relative amplitude [dB]", row=2, col=1)
+    fig.update_yaxes(title_text="Relative amplitude", row=2, col=1)
 
 
 def setup_plotly_layout() -> go.Figure:
@@ -225,7 +241,7 @@ def get_xy_projection(fig: go.Figure) -> go.Figure:
     new_fig.update_layout(
         scene={"aspectmode": "cube"},
         scene_camera={
-            "up": {"x": 0, "y": 0, "z": 1.5},
+            "up": {"x": 0, "y": 1, "z": 0},
             "center": {"x": 0, "y": 0, "z": 0},
             "eye": {"x": 0, "y": 0, "z": 1.5},
         },
