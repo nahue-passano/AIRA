@@ -18,7 +18,7 @@ from aira.utils import read_signals_dict, cartesian_to_spherical
 
 
 INTEGRATION_TIME = 0.005
-INTENSITY_THRESHOLD = -90
+INTENSITY_THRESHOLD = -60
 ANALYSIS_LENGTH = 1
 
 
@@ -152,4 +152,5 @@ if __name__ == "__main__":
     # }
 
     analyzer = AmbisonicsImpulseResponseAnalyzer()
-    analyzer.analyze(data, show=True)
+    fig = analyzer.analyze(data, show=True)
+    analyzer.export_xy_projection(fig, "projection.png")
