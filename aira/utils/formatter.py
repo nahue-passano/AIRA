@@ -76,7 +76,7 @@ def _(aformat_channels: List[np.ndarray]) -> np.ndarray:
     )
 
 
-def convert_polar_to_cartesian(
+def spherical_to_cartesian(
     radius: Union[float, np.ndarray],
     azimuth: Union[float, np.ndarray],
     elevation: Union[float, np.ndarray],
@@ -92,7 +92,29 @@ def convert_polar_to_cartesian(
         (x, y, z): Tuple[float | np.ndarray]. The corresponding Cartesian coordinates.
     """
     return (
-        radius * np.cos(azimuth) * np.sin(elevation),
-        radius * np.sin(azimuth) * np.sin(elevation),
-        radius * np.cos(elevation),
+        radius * np.cos(np.deg2rad(azimuth)) * np.cos(np.deg2rad(elevation)),
+        radius * np.sin(np.deg2rad(azimuth)) * np.cos(np.deg2rad(elevation)),
+        radius * np.sin(np.deg2rad(elevation)),
     )
+
+
+def cartesian_to_spherical(intensity_windowed: np.ndarray):
+    """_summary_
+
+    Parameters
+    ----------
+    intensity_windowed : np.ndarray
+        _description_
+
+    Returns
+    -------
+    _type_
+        _description_
+    """
+    # Convert to total intensity, azimuth and elevation
+    intensity = np.sqrt((intensity_windowed**2).sum(axis=0)).squeeze()
+    azimuth = np.rad2deg(
+        np.arctan2(intensity_windowed[1], intensity_windowed[0])
+    ).squeeze()
+    elevation = np.rad2deg(np.arcsin(intensity_windowed[2] / intensity)).squeeze()
+    return intensity, azimuth, elevation

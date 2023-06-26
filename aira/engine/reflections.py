@@ -5,7 +5,7 @@ from enum import Enum
 from typing import Tuple, Union
 
 import numpy as np
-from scipy.signal import find_peaks
+from scipy.signal import find_peaks, find_peaks_cwt
 
 
 # pylint: disable=too-few-public-methods
@@ -56,15 +56,33 @@ class NeighborReflectionDetectionStrategy(ReflectionDetectionStrategy):
         return find_peaks(intensity_magnitude)[0]
 
 
+class WaveletReflectionDetectionStrategy(ReflectionDetectionStrategy):
+    """Algorithm for detecting reflections based on the wavelet transform"""
+
+    @staticmethod
+    def get_indeces_of_reflections(intensity_magnitude: np.ndarray) -> np.ndarray:
+        """Find local maxima in the intensity magnitude signal.
+
+        Args:
+            intensity_magnitude (np.ndarray): intensity magnitude signal.
+
+        Returns:
+            np.ndarray: an array with the indeces of the peaks.
+        """
+        # Drop peak properties ([0]) and direct sound peak ([1])
+        return find_peaks_cwt(intensity_magnitude, widths=np.arange(5, 15))[0]
+
+
 class ReflectionDetectionStrategies(Enum):
     """Enum class for accessing the existing `ReflectionDetectionStrategy`s"""
 
     CORRELATION = CorrelationReflectionDetectionStrategy
     THRESHOLD = ThresholdReflectionDetectionStrategy
     SCIPY = NeighborReflectionDetectionStrategy
+    WAVELET = WaveletReflectionDetectionStrategy
 
 
-def get_hedgehog_arrays(
+def detect_reflections(
     intensity: np.ndarray,
     azimuth: np.ndarray,
     elevation: np.ndarray,
@@ -89,12 +107,11 @@ def get_hedgehog_arrays(
         detection_strategy = detection_strategy.value
 
     reflections_indeces = detection_strategy.get_indeces_of_reflections(intensity)
-    max_intensity_peak = intensity[reflections_indeces].argmax()
-    reflections_indeces_from_peak = reflections_indeces[max_intensity_peak:]
-
+    # Add direct sound
+    reflections_indeces = np.insert(reflections_indeces, 0, 0)
     return (
-        intensity[reflections_indeces_from_peak],
-        azimuth[reflections_indeces_from_peak],
-        elevation[reflections_indeces_from_peak],
-        reflections_indeces_from_peak,
+        intensity[reflections_indeces],
+        azimuth[reflections_indeces],
+        elevation[reflections_indeces],
+        reflections_indeces,
     )

@@ -131,3 +131,22 @@ def apply_low_pass_filter(
     )
 
     return lfilter(filter_coefficients, 1.0, signal)
+
+
+def moving_average_filter(array: np.ndarray, window_size: int) -> np.ndarray:
+    """_summary_
+
+    Parameters
+    ----------
+    array : np.ndarray
+        _description_
+    window_size : int
+        _description_
+
+    Returns
+    -------
+    np.ndarray
+        _description_
+    """
+    window = np.ones(window_size) / window_size
+    return np.convolve(array, window, mode="valid")

@@ -12,26 +12,21 @@ from PyQt5 import QtCore, QtGui, QtWidgets, QtWebEngineWidgets
 from PyQt5.QtWidgets import (
     QLabel,
     QFileDialog,
-    QMessageBox,
 )
-from PyQt5.QtGui import QPixmap
-from PyQt5.QtCore import Qt
-import os
+from PyQt5.QtGui import QPixmap,QPainter, QImage
+from PyQt5.QtCore import Qt, QPoint
+
 from pathlib import Path
 
 from aira.core import AmbisonicsImpulseResponseAnalyzer
 from aira.engine.input import InputMode
-
-INTEGRATION_TIME = 0.01
-
-analyzer = AmbisonicsImpulseResponseAnalyzer(integration_time=INTEGRATION_TIME)
 
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(1350, 727)
-        MainWindow.setMinimumSize(QtCore.QSize(1000, 800))
+        MainWindow.setMinimumSize(QtCore.QSize(1200, 900))
         MainWindow.setWindowIcon(QtGui.QIcon(str(Path("docs/images/aira-icon.png"))))
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setStyleSheet("background-color:#313438 ; ")
@@ -258,7 +253,6 @@ class Ui_MainWindow(object):
         font.setPointSize(12)
         self.rB_1ms.setFont(font)
         self.rB_1ms.setObjectName("rB_1ms")
-        self.rB_1ms.setChecked(True)
         self.verticalLayout_6.addWidget(self.rB_1ms)
         self.rB_5ms = QtWidgets.QRadioButton(self.frame_analyze)
         palette = QtGui.QPalette()
@@ -304,6 +298,7 @@ class Ui_MainWindow(object):
         font.setPointSize(12)
         self.rB_5ms.setFont(font)
         self.rB_5ms.setObjectName("rB_5ms")
+        self.rB_5ms.setChecked(True)
         self.verticalLayout_6.addWidget(self.rB_5ms)
         self.rB_10ms = QtWidgets.QRadioButton(self.frame_analyze)
         palette = QtGui.QPalette()
@@ -427,7 +422,7 @@ class Ui_MainWindow(object):
         self.label_analysis_length.setObjectName("label_analysis_length")
         self.verticalLayout_6.addWidget(self.label_analysis_length)
         self.lineEdit_aLength = QtWidgets.QLineEdit(self.frame_analyze)
-        self.lineEdit_aLength.setText("100")
+        self.lineEdit_aLength.setText("500")
         font = QtGui.QFont()
         font.setFamily("Lato")
         font.setPointSize(10)
@@ -494,7 +489,7 @@ class Ui_MainWindow(object):
         self.lineEdit_threshold.setStyleSheet(
             "background-color: rgb(255, 255, 255);\n" "\n" ""
         )
-        self.lineEdit_threshold.setText("60")
+        self.lineEdit_threshold.setText("-60")
         self.lineEdit_threshold.setObjectName("lineEdit_threshold")
         self.verticalLayout_6.addWidget(self.lineEdit_threshold)
         spacerItem5 = QtWidgets.QSpacerItem(
@@ -559,19 +554,9 @@ class Ui_MainWindow(object):
         self.verticalLayout_8 = QtWidgets.QVBoxLayout(self.frame_hedgehog)
         self.verticalLayout_8.setContentsMargins(0, 0, 0, 0)
         self.verticalLayout_8.setObjectName("verticalLayout_8")
-        self.frame_hedgehog_label = QtWidgets.QFrame(self.frame_hedgehog)
-        self.frame_hedgehog_label.setMaximumSize(QtCore.QSize(16777215, 42))
-        self.frame_hedgehog_label.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        self.frame_hedgehog_label.setFrameShadow(QtWidgets.QFrame.Raised)
-        self.frame_hedgehog_label.setObjectName("frame_hedgehog_label")
-        self.horizontalLayout_2 = QtWidgets.QHBoxLayout(self.frame_hedgehog_label)
-        self.horizontalLayout_2.setContentsMargins(0, 0, 0, 0)
-        self.horizontalLayout_2.setObjectName("horizontalLayout_2")
         spacerItem11 = QtWidgets.QSpacerItem(
             430, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum
         )
-        self.horizontalLayout_2.addItem(spacerItem11)
-        self.label_hedgehog = QtWidgets.QLabel(self.frame_hedgehog_label)
         palette = QtGui.QPalette()
         brush = QtGui.QBrush(QtGui.QColor(69, 113, 213))
         brush.setStyle(QtCore.Qt.SolidPattern)
@@ -609,19 +594,12 @@ class Ui_MainWindow(object):
         brush = QtGui.QBrush(QtGui.QColor(49, 52, 56))
         brush.setStyle(QtCore.Qt.SolidPattern)
         palette.setBrush(QtGui.QPalette.Disabled, QtGui.QPalette.Window, brush)
-        self.label_hedgehog.setPalette(palette)
         font = QtGui.QFont()
         font.setFamily("Lato")
         font.setPointSize(15)
-        self.label_hedgehog.setFont(font)
-        self.label_hedgehog.setAlignment(QtCore.Qt.AlignCenter)
-        self.label_hedgehog.setObjectName("label_hedgehog")
-        self.horizontalLayout_2.addWidget(self.label_hedgehog)
         spacerItem12 = QtWidgets.QSpacerItem(
             429, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum
         )
-        self.horizontalLayout_2.addItem(spacerItem12)
-        self.verticalLayout_8.addWidget(self.frame_hedgehog_label)
         self.frame_hedgehog_plot = QtWidgets.QFrame(self.frame_hedgehog)
         self.frame_hedgehog_plot.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.frame_hedgehog_plot.setFrameShadow(QtWidgets.QFrame.Raised)
@@ -646,6 +624,7 @@ class Ui_MainWindow(object):
         self.verticalLayout_10.setObjectName("verticalLayout_10")
         self.frame_plan_header = QtWidgets.QFrame(self.frame_tab_plan)
         self.frame_plan_header.setMaximumSize(QtCore.QSize(16777215, 60))
+        self.frame_plan_header.setMinimumSize(QtCore.QSize(0, 60))
         self.frame_plan_header.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.frame_plan_header.setFrameShadow(QtWidgets.QFrame.Raised)
         self.frame_plan_header.setObjectName("frame_plan_header")
@@ -683,7 +662,6 @@ class Ui_MainWindow(object):
         self.label_plan_view.setPixmap(
             pixmap.scaled(750, 3000, aspectRatioMode=Qt.KeepAspectRatio)
         )
-        # self.label_plan_view.addWidget(self.label_plan_view)
         self.horizontalLayout_6.addWidget(self.label_plan_view)
         self.horizontalLayout_5.addWidget(self.frame_plan_view)
         self.verticalLayout_10.addWidget(self.frame_view)
@@ -812,7 +790,7 @@ class Ui_MainWindow(object):
 
         # CONEXIONES DE GUI CON ACCIONES
 
-        # Creo los labels para guardar la data que devuelven las funciones de import triggereadas
+        # Labels para guardar la data que devuelven las funciones de import triggereadas
         self.path_1 = QLabel()
         self.path_2 = QLabel()
         self.path_3 = QLabel()
@@ -820,6 +798,7 @@ class Ui_MainWindow(object):
         self.path_5 = QLabel()
         self.input_mode_selected = QLabel()
         self.channels_per_file_selected = QLabel()
+
 
         self.actionImport_LSS.triggered.connect(self.import_LSS)
         self.actionImport_Aformat_1channel.triggered.connect(
@@ -834,10 +813,11 @@ class Ui_MainWindow(object):
         self.actionImport_Bformat_4channels.triggered.connect(
             self.import_Bformat_4channels
         )
-
+        self.actionExport_hedgehog_plot.triggered.connect(self.export_hedgehog)
         self.pb_analyze.clicked.connect(self.analyze)
         self.pB_load_plan.clicked.connect(self.load_plan)
         self.pB_export_plan.clicked.connect(self.export_plan)
+        self.label_plan_view.mousePressEvent = lambda event: self.mousePressEvent(event)
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
@@ -855,7 +835,7 @@ class Ui_MainWindow(object):
         )
         self.label_threshold.setText(_translate("MainWindow", "Threshold [dB]"))
         self.pb_analyze.setText(_translate("MainWindow", "Analyze"))
-        self.label_hedgehog.setText(_translate("MainWindow", "Hedgehog Plot"))
+
         self.tabWidget.setTabText(
             self.tabWidget.indexOf(self.tab_main), _translate("MainWindow", "Main")
         )
@@ -950,7 +930,7 @@ class Ui_MainWindow(object):
                     "channel_Z": Z_path,
                     "input_mode": input_mode,
                     "channels_per_file": channels_per_file,
-                    "frequency_correction": True,
+                    "frequency_correction": False,
                 }
             else:
                 B4_path = self.path_1.text()
@@ -959,11 +939,31 @@ class Ui_MainWindow(object):
                     "stacked_signals": B4_path,
                     "input_mode": input_mode,
                     "channels_per_file": channels_per_file,
-                    "frequency_correction": True,
+                    "frequency_correction": False,
                 }
 
+        if self.rB_1ms.isChecked():
+            integration_time = 0.001
+        elif self.rB_5ms.isChecked():
+            integration_time = 0.005
+        else:
+            integration_time = 0.01
+
+        intensity_threshold = float(self.lineEdit_threshold.text())
+        analysis_length = float(self.lineEdit_aLength.text())
+
+        analyzer = AmbisonicsImpulseResponseAnalyzer(
+            integration_time=integration_time,
+            intensity_threshold=intensity_threshold,
+            analysis_length=analysis_length)
         fig = analyzer.analyze(input_dict=data)
-        self.gV_hedgehog.setHtml(fig.to_html(include_plotlyjs="cdn"))
+        analyzer.export_xy_projection(fig, "projection.png")
+        fig.write_html("out.html")    
+        url = QtCore.QUrl.fromLocalFile(str(Path("out.html").resolve()))
+        self.gV_hedgehog.load(url)
+        self.plotly_fig = fig
+
+        
 
     def load_plan(self):
         file_dialog = QFileDialog()
@@ -971,11 +971,40 @@ class Ui_MainWindow(object):
             MainWindow, "Select image", "", "Image file (*.png *.jpg *.jpeg)"
         )
         if file_path:
-            pixmap = QPixmap(file_path)
-            self.label_plan_view.setPixmap(
-                pixmap.scaled(750, 3000, aspectRatioMode=Qt.KeepAspectRatio)
-            )
+            # Cargar la imagen base
+            self.base_image = QImage(file_path)
+            scaled_image = self.base_image.scaled(1000, 800, Qt.AspectRatioMode.KeepAspectRatio)
+
+            # Crear una imagen resultante del mismo tamaño que la imagen base
+            self.result_image = QImage(scaled_image.size(), QImage.Format_ARGB32)
+            self.result_image.fill(0)  # Rellenar con transparencia
+            
+            # Mostrar la imagen base en un QLabel
+            self.label_plan_view.setPixmap(QPixmap.fromImage(scaled_image)) 
+
+            # Ajustar el tamaño del QLabel al tamaño de la imagen base escalada
+            self.label_plan_view.resize(scaled_image.size())
+
             self.enable_export()
+
+    def mousePressEvent(self, event):
+        if event.button() == Qt.LeftButton:
+            # Verificar si el clic ocurrió dentro de los límites de la imagen base
+            if event.x() < self.base_image.width() and event.y() < self.base_image.height():
+                # Cargar la imagen superpuesta
+                overlay_image = QImage("projection.png")
+                overlay_position = QPoint(event.x()-787, event.y()-350)
+                
+                # Dibujar la imagen base en la imagen resultante
+                painter = QPainter(self.result_image)
+                painter.drawImage(0, 0, self.base_image.scaled(1000, 800, Qt.AspectRatioMode.KeepAspectRatio))
+
+                # Dibujar la imagen superpuesta en la imagen resultante
+                painter.drawImage(overlay_position, overlay_image)
+                painter.end()
+
+                # Mostrar la imagen resultante en el QLabel
+                self.label_plan_view.setPixmap(QPixmap.fromImage(self.result_image))
 
     def enable_export(self):
         self.pB_export_plan.setEnabled(True)
@@ -999,6 +1028,8 @@ class Ui_MainWindow(object):
         save_path, _ = file_dialog.getSaveFileName(
             MainWindow, "Export image", "", "Image file (*.png *.jpg *.jpeg)"
         )
+        if save_path:
+            self.result_image.save(save_path)
 
     def import_Aformat_1channel(self):
         file_dialog = QFileDialog()
@@ -1090,6 +1121,8 @@ class Ui_MainWindow(object):
         save_path, _ = file_dialog.getSaveFileName(
             MainWindow, "Export image", "", "Image file (*.png *.jpg *.jpeg)"
         )
+        self.plotly_fig.write_image(save_path, 'png', width=1366, height=768, scale=1.0)
+        
 
 
 if __name__ == "__main__":
