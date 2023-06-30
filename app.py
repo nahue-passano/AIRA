@@ -73,10 +73,6 @@ def run_streamlit_app():
         fig.update_layout(height=1080)
         st.plotly_chart(fig, use_container_width=True, height=1080)
 
-        # Generar un gráfico genérico con Plotly
-        fig = go.Figure(data=go.Scatter(x=[1, 2, 3, 4], y=[10, 5, 7, 2]))
-        st.plotly_chart(fig)
-
 
 if __name__ == "__main__":
     run_streamlit_app()
