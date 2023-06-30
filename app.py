@@ -51,31 +51,31 @@ def run_streamlit_app():
         analysis_length = st.text_input("Analysis length [ms]", value="500")
         intensity_threshold = st.text_input("Intensity threshold [dB]", value=-60)
 
-        # "Analyze" button
-        if st.button("Analyze", use_container_width=True):
-            data = {
-                "front_left_up": save_temp_file(audio_file_flu),
-                "front_right_down": save_temp_file(audio_file_frd),
-                "back_right_up": save_temp_file(audio_file_bru),
-                "back_left_down": save_temp_file(audio_file_bld),
-                "inverse_filter": save_temp_file(audio_file_inverse_filter),
-                "input_mode": InputMode.LSS,
-                "channels_per_file": 1,
-                "frequency_correction": True,
-            }
+    # "Analyze" button
+    if st.button("Analyze", use_container_width=True):
+        data = {
+            "front_left_up": save_temp_file(audio_file_flu),
+            "front_right_down": save_temp_file(audio_file_frd),
+            "back_right_up": save_temp_file(audio_file_bru),
+            "back_left_down": save_temp_file(audio_file_bld),
+            "inverse_filter": save_temp_file(audio_file_inverse_filter),
+            "input_mode": InputMode.LSS,
+            "channels_per_file": 1,
+            "frequency_correction": True,
+        }
 
-            analyzer = AmbisonicsImpulseResponseAnalyzer(
-                int(integration_time),
-                float(intensity_threshold),
-                float(analysis_length),
-            )
-            fig = analyzer.analyze(data, show=False)
-            fig.update_layout(height=1080)
-            st.plotly_chart(fig, use_container_width=True, height=1080)
+        analyzer = AmbisonicsImpulseResponseAnalyzer(
+            int(integration_time),
+            float(intensity_threshold),
+            float(analysis_length),
+        )
+        fig = analyzer.analyze(data, show=False)
+        fig.update_layout(height=1080)
+        st.plotly_chart(fig, use_container_width=True, height=1080)
 
-            # Generar un gráfico genérico con Plotly
-            fig = go.Figure(data=go.Scatter(x=[1, 2, 3, 4], y=[10, 5, 7, 2]))
-            st.plotly_chart(fig)
+        # Generar un gráfico genérico con Plotly
+        fig = go.Figure(data=go.Scatter(x=[1, 2, 3, 4], y=[10, 5, 7, 2]))
+        st.plotly_chart(fig)
 
 
 if __name__ == "__main__":
