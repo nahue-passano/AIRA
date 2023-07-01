@@ -23,14 +23,24 @@ def run_streamlit_app():
     logo_path = "docs/images/aira-banner.png"
     personal_logo_path = "docs/images/nahue-passano.png"
     st.columns(11)[10].image(personal_logo_path, use_column_width=True)
-    st.columns(3)[1].image(logo_path, use_column_width=True)
 
     # Audio loading and settings
 
-    audio_files, settings = st.columns(2)
+    settings, audio_files = st.columns(2)
+
+    with settings:
+        st.image(logo_path, use_column_width=True)
+        st.subheader("⚙️ Settings")
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            integration_time = st.selectbox("Integration time [ms]", [1, 5, 10])
+        with col2:
+            analysis_length = st.text_input("Analysis length [ms]", value="500")
+        with col3:
+            intensity_threshold = st.text_input("Intensity threshold [dB]", value=-60)
 
     with audio_files:
-        st.header("🔉 LSS room responses in A-Format")
+        st.subheader("🔉 LSS room responses in A-Format")
         up_files, down_files = st.columns(2)
 
         with up_files:
@@ -44,12 +54,6 @@ def run_streamlit_app():
         audio_file_inverse_filter = st.file_uploader(
             "Inverse filter", type=["mp3", "wav"]
         )
-
-    with settings:
-        st.header("⚙️ Settings")
-        integration_time = st.selectbox("Integration time [ms]", [1, 5, 10])
-        analysis_length = st.text_input("Analysis length [ms]", value="500")
-        intensity_threshold = st.text_input("Intensity threshold [dB]", value=-60)
 
     # "Analyze" button
     if st.button("Analyze", use_container_width=True):
@@ -71,7 +75,11 @@ def run_streamlit_app():
             analysis_length=float(analysis_length) / 1000,
             show=False,
         )
-        fig.update_layout(height=1080)
+        fig.update_layout(
+            height=1080,
+            paper_bgcolor="rgb(14,17,23)",
+            plot_bgcolor="rgb(14,17,23)",
+        )
         st.plotly_chart(fig, use_container_width=True, height=1080)
 
 
