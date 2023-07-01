@@ -141,7 +141,15 @@ if __name__ == "__main__":
     #     "channels_per_file": 4,
     #     "frequency_correction": False,
     # }
-
+    integration_time = 0.01
+    intensity_threshold = -50
+    analysis_length = 0.3
     analyzer = AmbisonicsImpulseResponseAnalyzer()
-    fig = analyzer.analyze(data, show=True)
+    fig = analyzer.analyze(
+        input_dict=data,
+        integration_time=integration_time,
+        intensity_threshold=intensity_threshold,
+        analysis_length=analysis_length,
+        show=True,
+    )
     analyzer.export_xy_projection(fig, "projection.png")

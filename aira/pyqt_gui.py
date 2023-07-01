@@ -949,7 +949,7 @@ class Ui_MainWindow(object):
             integration_time = 0.01
 
         intensity_threshold = float(self.lineEdit_threshold.text())
-        analysis_length = float(self.lineEdit_aLength.text())
+        analysis_length = float(self.lineEdit_aLength.text()) / 1000
 
         analyzer = AmbisonicsImpulseResponseAnalyzer()
         fig = analyzer.analyze(

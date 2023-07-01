@@ -63,15 +63,12 @@ def run_streamlit_app():
             "channels_per_file": 1,
             "frequency_correction": True,
         }
-        integration_time = 0.01
-        intensity_threshold = -20
-        analysis_length = 100
         analyzer = AmbisonicsImpulseResponseAnalyzer()
         fig = analyzer.analyze(
             input_dict=data,
-            integration_time=int(integration_time),
+            integration_time=float(integration_time) / 1000,
             intensity_threshold=float(intensity_threshold),
-            analysis_length=float(analysis_length),
+            analysis_length=float(analysis_length) / 1000,
             show=False,
         )
         fig.update_layout(height=1080)
