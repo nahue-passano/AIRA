@@ -1,9 +1,9 @@
-import streamlit as st
-import plotly.graph_objects as go
-from aira.core import AmbisonicsImpulseResponseAnalyzer
-from aira.engine.input import InputMode
 import os
 import tempfile
+import streamlit as st
+
+from aira.core import AmbisonicsImpulseResponseAnalyzer
+from aira.engine.input import InputMode
 
 
 def save_temp_file(file):
@@ -63,13 +63,17 @@ def run_streamlit_app():
             "channels_per_file": 1,
             "frequency_correction": True,
         }
-
-        analyzer = AmbisonicsImpulseResponseAnalyzer(
-            int(integration_time),
-            float(intensity_threshold),
-            float(analysis_length),
+        integration_time = 0.01
+        intensity_threshold = -20
+        analysis_length = 100
+        analyzer = AmbisonicsImpulseResponseAnalyzer()
+        fig = analyzer.analyze(
+            input_dict=data,
+            integration_time=int(integration_time),
+            intensity_threshold=float(intensity_threshold),
+            analysis_length=float(analysis_length),
+            show=False,
         )
-        fig = analyzer.analyze(data, show=False)
         fig.update_layout(height=1080)
         st.plotly_chart(fig, use_container_width=True, height=1080)
 
