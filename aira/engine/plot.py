@@ -153,7 +153,7 @@ def setup_plotly_layout() -> go.Figure:
         vertical_spacing=0.05,
         specs=[[{"type": "scene"}], [{"type": "xy"}]],
         subplot_titles=("<b>Hedgehog</b>", "<b>Omnidirectional channel</b>"),
-        figure=initial_fig
+        figure=initial_fig,
     )
 
     camera, buttons = get_plotly_scenes()

@@ -13,7 +13,7 @@ from PyQt5.QtWidgets import (
     QLabel,
     QFileDialog,
 )
-from PyQt5.QtGui import QPixmap,QPainter, QImage
+from PyQt5.QtGui import QPixmap, QPainter, QImage
 from PyQt5.QtCore import Qt, QPoint
 
 from pathlib import Path
@@ -799,7 +799,6 @@ class Ui_MainWindow(object):
         self.input_mode_selected = QLabel()
         self.channels_per_file_selected = QLabel()
 
-
         self.actionImport_LSS.triggered.connect(self.import_LSS)
         self.actionImport_Aformat_1channel.triggered.connect(
             self.import_Aformat_1channel
@@ -950,20 +949,20 @@ class Ui_MainWindow(object):
             integration_time = 0.01
 
         intensity_threshold = float(self.lineEdit_threshold.text())
-        analysis_length = float(self.lineEdit_aLength.text())
+        analysis_length = float(self.lineEdit_aLength.text()) / 1000
 
-        analyzer = AmbisonicsImpulseResponseAnalyzer(
+        analyzer = AmbisonicsImpulseResponseAnalyzer()
+        fig = analyzer.analyze(
+            input_dict=data,
             integration_time=integration_time,
             intensity_threshold=intensity_threshold,
-            analysis_length=analysis_length)
-        fig = analyzer.analyze(input_dict=data)
+            analysis_length=analysis_length,
+        )
         analyzer.export_xy_projection(fig, "projection.png")
-        fig.write_html("out.html")    
+        fig.write_html("out.html")
         url = QtCore.QUrl.fromLocalFile(str(Path("out.html").resolve()))
         self.gV_hedgehog.load(url)
         self.plotly_fig = fig
-
-        
 
     def load_plan(self):
         file_dialog = QFileDialog()
@@ -973,14 +972,16 @@ class Ui_MainWindow(object):
         if file_path:
             # Cargar la imagen base
             self.base_image = QImage(file_path)
-            scaled_image = self.base_image.scaled(1000, 800, Qt.AspectRatioMode.KeepAspectRatio)
+            scaled_image = self.base_image.scaled(
+                1000, 800, Qt.AspectRatioMode.KeepAspectRatio
+            )
 
             # Crear una imagen resultante del mismo tamaño que la imagen base
             self.result_image = QImage(scaled_image.size(), QImage.Format_ARGB32)
             self.result_image.fill(0)  # Rellenar con transparencia
-            
+
             # Mostrar la imagen base en un QLabel
-            self.label_plan_view.setPixmap(QPixmap.fromImage(scaled_image)) 
+            self.label_plan_view.setPixmap(QPixmap.fromImage(scaled_image))
 
             # Ajustar el tamaño del QLabel al tamaño de la imagen base escalada
             self.label_plan_view.resize(scaled_image.size())
@@ -990,14 +991,23 @@ class Ui_MainWindow(object):
     def mousePressEvent(self, event):
         if event.button() == Qt.LeftButton:
             # Verificar si el clic ocurrió dentro de los límites de la imagen base
-            if event.x() < self.base_image.width() and event.y() < self.base_image.height():
+            if (
+                event.x() < self.base_image.width()
+                and event.y() < self.base_image.height()
+            ):
                 # Cargar la imagen superpuesta
                 overlay_image = QImage("projection.png")
-                overlay_position = QPoint(event.x()-787, event.y()-350)
-                
+                overlay_position = QPoint(event.x() - 787, event.y() - 350)
+
                 # Dibujar la imagen base en la imagen resultante
                 painter = QPainter(self.result_image)
-                painter.drawImage(0, 0, self.base_image.scaled(1000, 800, Qt.AspectRatioMode.KeepAspectRatio))
+                painter.drawImage(
+                    0,
+                    0,
+                    self.base_image.scaled(
+                        1000, 800, Qt.AspectRatioMode.KeepAspectRatio
+                    ),
+                )
 
                 # Dibujar la imagen superpuesta en la imagen resultante
                 painter.drawImage(overlay_position, overlay_image)
@@ -1121,8 +1131,7 @@ class Ui_MainWindow(object):
         save_path, _ = file_dialog.getSaveFileName(
             MainWindow, "Export image", "", "Image file (*.png *.jpg *.jpeg)"
         )
-        self.plotly_fig.write_image(save_path, 'png', width=1366, height=768, scale=1.0)
-        
+        self.plotly_fig.write_image(save_path, "png", width=1366, height=768, scale=1.0)
 
 
 if __name__ == "__main__":
