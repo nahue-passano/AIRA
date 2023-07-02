@@ -16,27 +16,18 @@ from aira.engine.reflections import detect_reflections
 from aira.utils import read_signals_dict, cartesian_to_spherical
 
 
-INTEGRATION_TIME = 0.005
-INTENSITY_THRESHOLD = -60
-ANALYSIS_LENGTH = 1
-
-
 @dataclass
 class AmbisonicsImpulseResponseAnalyzer:
     """Main class for analyzing Ambisonics impulse responses"""
 
-    integration_time: float = INTEGRATION_TIME
-    intensity_threshold: float = INTENSITY_THRESHOLD
-    analysis_length: float = ANALYSIS_LENGTH
-    bformat_frequency_correction: bool = True
     input_builder = InputProcessorChain()
 
     def analyze(
         self,
         input_dict: dict,
-        integration_time: float = INTEGRATION_TIME,
-        intensity_threshold: float = INTENSITY_THRESHOLD,
-        analysis_length: float = ANALYSIS_LENGTH,
+        integration_time: float,
+        intensity_threshold: float,
+        analysis_length: float,
         show: bool = False,
     ) -> go.Figure:
         """Analyzes a set of measurements in Ambisonics format and plots a hedgehog
@@ -150,7 +141,15 @@ if __name__ == "__main__":
     #     "channels_per_file": 4,
     #     "frequency_correction": False,
     # }
-
+    integration_time = 0.01
+    intensity_threshold = -50
+    analysis_length = 0.3
     analyzer = AmbisonicsImpulseResponseAnalyzer()
-    fig = analyzer.analyze(data, show=True)
+    fig = analyzer.analyze(
+        input_dict=data,
+        integration_time=integration_time,
+        intensity_threshold=intensity_threshold,
+        analysis_length=analysis_length,
+        show=True,
+    )
     analyzer.export_xy_projection(fig, "projection.png")
